@@ -1,0 +1,156 @@
+{
+	"editor": {
+		"allAngles": false,
+		"entityTextureMode": true
+	},
+	"textureWidth": 16,
+	"textureHeight": 16,
+
+	"textures": {
+		"pages": "block/books/pages",
+		"books": "block/books/books"
+	},
+	"elements": [
+		{
+			"name": "origin",
+			"from": [ 0.0, 0.0, 0.0 ], 
+			"to": [ 0.0, 0.0, 0.0 ], 
+			"uv": [ 0.0, 0.0 ],
+			"rotationOrigin": [ 0.0, 0.0, 0.0 ],
+			"faces": {
+				"north": { "texture": "#book", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false },
+				"east": { "texture": "#book", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false },
+				"south": { "texture": "#book", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false },
+				"west": { "texture": "#book", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false },
+				"up": { "texture": "#book", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false },
+				"down": { "texture": "#book", "uv": [ 0.0, 0.0, 0.5, 0.5 ], "enabled": false }
+			},
+			"children": [
+				{
+					"name": "Pages",
+					"from": [ -2.0, 0.4, -4.0 ], 
+					"to": [ 3.0, 1.4, 4.0 ], 
+					"autoUnwrap": false,
+					"uv": [ 0.0, 0.0 ],
+					"rotationOrigin": [ 0.0, 0.4, 0.0 ],
+					"faces": {
+						"north": { "texture": "#pages", "uv": [ 0.0, 13.0, 5.0, 14.0 ] },
+						"east": { "texture": "#pages", "uv": [ 1.0, 13.0, 9.0, 14.0 ] },
+						"south": { "texture": "#pages", "uv": [ 11.0, 13.0, 16.0, 14.0 ] },
+						"west": { "texture": "#book", "uv": [ 0.0, 0.0, 8.0, 1.0 ], "enabled": false },
+						"up": { "texture": "#book", "uv": [ 0.0, 0.0, 5.0, 8.0 ], "enabled": false },
+						"down": { "texture": "#book", "uv": [ 0.0, 0.0, 5.0, 8.0 ], "enabled": false }
+					},
+					"children": [
+						{
+							"name": "CoverTop",
+							"from": [ 0.0, 1.0, -0.2 ], 
+							"to": [ 5.2, 1.4, 8.2 ], 
+							"autoUnwrap": false,
+							"uv": [ 7.0, 6.5 ],
+							"rotationOrigin": [ -0.3, 1.0, 4.0 ],
+							"faces": {
+								"north": { "texture": "#books", "uv": [ 2.0, 15.0, 7.0, 15.5 ] },
+								"east": { "texture": "#books", "uv": [ 0.0, 8.0, 0.5, 16.0 ], "rotation": 270 },
+								"south": { "texture": "#books", "uv": [ 2.0, 15.0, 7.0, 15.5 ], "rotation": 180 },
+								"west": { "texture": "#book", "uv": [ 3.0, 0.0, 3.5, 8.0 ], "rotation": 90, "enabled": false },
+								"up": { "texture": "#books", "uv": [ 3.0, 0.0, 8.0, 8.0 ], "rotation": 180 },
+								"down": { "texture": "#books", "uv": [ 11.0, 8.0, 16.0, 16.0 ] }
+							}
+						},
+						{
+							"name": "CoverBottom",
+							"from": [ 0.0, -0.4, -0.2 ], 
+							"to": [ 5.2, 0.0, 8.2 ], 
+							"autoUnwrap": false,
+							"uv": [ 0.0, 7.5 ],
+							"rotationOrigin": [ 2.7, -0.4, 4.0 ],
+							"faces": {
+								"north": { "texture": "#books", "uv": [ 0.0, 11.0, 0.5, 16.0 ], "rotation": 90 },
+								"east": { "texture": "#books", "uv": [ 2.0, 14.0, 10.0, 15.0 ] },
+								"south": { "texture": "#books", "uv": [ 15.0, 3.0, 15.5, 8.0 ], "rotation": 90 },
+								"west": { "texture": "#books", "uv": [ 0.0, 0.0, 8.0, 1.0 ], "enabled": false },
+								"up": { "texture": "#books", "uv": [ 8.0, 7.0, 13.0, 15.0 ] },
+								"down": { "texture": "#books", "uv": [ 10.0, 8.0, 15.0, 16.0 ] }
+							}
+						},
+						{
+							"name": "Back",
+							"from": [ -0.3, -0.4, -0.2 ], 
+							"to": [ 0.0, 1.4, 8.2 ], 
+							"autoUnwrap": false,
+							"uv": [ 1.5, -2.5 ],
+							"rotationOrigin": [ -0.3, 0.5, 4.0 ],
+							"faces": {
+								"north": { "texture": "#books", "uv": [ 2.0, 6.0, 3.0, 7.0 ] },
+								"east": { "texture": "#books", "uv": [ 2.0, 9.0, 10.0, 10.0 ] },
+								"south": { "texture": "#books", "uv": [ 10.0, 6.0, 11.0, 7.0 ] },
+								"west": { "texture": "#books", "uv": [ 8.0, 2.0, 16.0, 3.0 ] },
+								"up": { "texture": "#books", "uv": [ 0.0, 8.0, 1.0, 16.0 ] },
+								"down": { "texture": "#books", "uv": [ 2.0, 0.0, 3.0, 8.0 ] }
+							}
+						},
+						{
+							"name": "Backend",
+							"from": [ -0.6, -0.2, -0.2 ], 
+							"to": [ -0.3, 1.2, 8.2 ], 
+							"autoUnwrap": false,
+							"uv": [ 0.0, 6.0 ],
+							"rotationOrigin": [ -0.6, 0.5, 4.0 ],
+							"faces": {
+								"north": { "texture": "#books", "uv": [ 0.0, 7.0, 1.0, 8.0 ] },
+								"east": { "texture": "#book", "uv": [ 0.0, 0.0, 8.0, 1.0 ], "enabled": false },
+								"south": { "texture": "#books", "uv": [ 1.0, 7.0, 2.0, 8.0 ] },
+								"west": { "texture": "#books", "uv": [ 4.0, 8.0, 12.0, 9.0 ] },
+								"up": { "texture": "#books", "uv": [ 1.0, 8.0, 2.0, 16.0 ] },
+								"down": { "texture": "#books", "uv": [ 0.0, 5.5, 8.0, 6.0 ], "rotation": 90 }
+							}
+						},
+						{
+							"name": "titlepage",
+							"from": [ 0.0, 0.0, 0.0 ], 
+							"to": [ 5.0, 1.0, 8.0 ], 
+							"autoUnwrap": false,
+							"uv": [ 0.0, 0.0 ],
+							"faces": {
+								"north": { "texture": "#null", "uv": [ 0.0, 8.0, 5.0, 9.0 ] },
+								"east": { "texture": "#null", "uv": [ 5.0, 8.0, 13.0, 9.0 ] },
+								"south": { "texture": "#pages", "uv": [ 11.0, 13.0, 16.0, 14.0 ] },
+								"west": { "texture": "#null", "uv": [ 5.0, 8.0, 13.0, 9.0 ] },
+								"up": { "texture": "#pages", "uv": [ 0.0, 0.0, 5.0, 8.0 ] },
+								"down": { "texture": "#pages", "uv": [ 5.0, 0.0, 10.0, 8.0 ] }
+							}
+						}
+					]
+				}
+			]
+		}
+	],
+	"animations": [
+		{
+			"name": "open",
+			"code": "open",
+			"quantityframes": 16,
+			"onActivityStopped": "Rewind",
+			"onAnimationEnd": "Stop",
+			"keyframes": [
+				{
+					"frame": 0,
+					"elements": {
+						"origin": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0 },
+						"Pages": {  },
+						"CoverTop": { "offsetX": 0.0, "offsetY": 0.0, "offsetZ": 0.0, "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 0.0 }
+					}
+				},
+				{
+					"frame": 15,
+					"elements": {
+						"origin": { "offsetX": 2.5, "offsetY": 0.0, "offsetZ": 0.0 },
+						"Pages": {  },
+						"CoverTop": { "rotationX": 0.0, "rotationY": 0.0, "rotationZ": 190.0 }
+					}
+				}
+			]
+		}
+	]
+}

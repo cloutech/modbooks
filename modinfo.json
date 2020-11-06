@@ -1,0 +1,11 @@
+{
+  "type": "code",
+  "modid": "books",
+  "name": "Writeable Books",
+  "author": "Christoph Clouser",
+  "description": "Adds colored ink, paper, books and a quill!",
+  "version": "0.1.0",
+  "dependency": {
+    "game": "1.13.4"
+  }
+}

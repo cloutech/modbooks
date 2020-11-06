@@ -1,0 +1,7 @@
+{
+	"books:block-books-north": "Book",
+	"books:block-bookwithinkpot-north" : "Book and Inkpot",
+	"books:block-inkpot": "Inkpot",
+	"books:block-booksquills-north":"Quill",
+	"books:item-itemquill" : "Quill",
+}

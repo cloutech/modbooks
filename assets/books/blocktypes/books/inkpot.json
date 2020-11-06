@@ -1,0 +1,73 @@
+{
+	code: "inkpot",
+	blockmaterial: "Glass",
+	maxstacksize: 128,
+	resistance: 0.25,
+	lightabsorption: 0,
+	ambientocclusion: true,
+	renderpass: "opaque",
+	faceCullMode: "nevercull",
+	drawtype:"json",
+	vertexFlags: {
+		zOffset: 2
+	},
+	rainPermeable: false,
+	materialDensity:1200,
+	
+	attributes: {
+		pigment: {
+			name: "Black Ink",
+			color: { red: 0, green: 0, blue: 0 },
+		},
+		displaycaseable: true, 
+		shelvable: true,
+	},
+	
+	behaviors: [ { "name": "Unstable" } ],
+	creativeinventory: { 
+		"general": ["*"] 
+	},
+	textures: {
+
+    },
+	shape: {
+		base: "block/books/inkpot"
+	},	
+	shapeinventory: {
+		base: "block/books/inv_inkpot"
+	},
+	sideAo: { all: false },
+	sideopaque: {
+		all: false
+	},
+	sounds: {
+		"place": "player/buildhigh",
+		"break": "block/glass",
+		"hit": "block/glass"
+	},
+	collisionbox: { x1: 0.42, y1: 0, z1: 0.42, x2: 0.58, y2: 0.12, z2: 0.58, rotateY: 0 },
+	selectionbox: { x1: 0.42, y1: 0, z1: 0.42, x2: 0.58, y2: 0.12, z2: 0.58, rotateY: 0 },
+	
+	guiTransform: {
+		translation: { x: 0, y: 8, z: 0 },
+		rotation: { x: -42, y: -19, z: 2 },
+		origin: { x: 0, y: 0, z: 0 },
+		scale: 8
+	},
+	fpHandTransform: {
+		translation: { x: 0.2, y: 0.4, z: 1 },
+		rotation: { x: 23, y: 140, z: -3 },
+		origin: { x: 0, y: 0, z: 0 },
+		scale: 4.7
+	},
+	tpHandTransform: {
+		translation: { x: -0.1, y: -0.1, z: 0 },
+		rotation: { x: 36, y: -53, z: -22 },
+		origin: { x: 0, y: 0, z: 0 },
+		scale: 1.5
+	},
+	attributes: {
+		onDisplayTransform: {
+			origin: { x: 0, y: 0, z: 0 }
+	}
+}

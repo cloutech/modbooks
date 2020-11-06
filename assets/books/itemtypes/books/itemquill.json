@@ -1,0 +1,14 @@
+{
+	code: "itemquill",
+	texture: { base: "item/books/itemquill" },
+	creativeinventory: { "general": ["*"], "items": ["*"] },
+	maxstacksize: 128,
+	materialDensity: 20,
+	combustibleProps: {
+		burnTemperature: 400,
+		burnDuration: 2,
+	},
+	attributes: {
+			quill:"true",
+	}
+}
