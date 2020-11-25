@@ -17,16 +17,21 @@ using Vintagestory.GameContent;
 namespace books.src
 {
 
-    public class BlockEntityBooks : BlockEntity 
+    public class BlockEntityBooks : BlockEntity
     {
+
         public ICoreClientAPI Capi;
         public ICoreServerAPI Sapi;
 
-        private string Text = "";
-        private string Title = "";
-        //int color;
+        //private string[] Pages;
+        private string Text = "Enter you text ... ";
+        private string Title = "Your title ... ";
+        int color;
+
         // Charcoal default
-        public int tempColor = ColorUtil.ToRgba(255, 25, 24, 22);
+        int tempColor = ColorUtil.ToRgba(255, 25, 24, 22);
+        ItemStack tempStack;
+        BooksGui BGui;
 
         public BlockEntityBooks() : base() { }
 
@@ -47,11 +52,11 @@ namespace books.src
             this.Title = title;
         }
 
-        public BlockEntityBooks(ICoreServerAPI sapi):base()
+        public BlockEntityBooks(ICoreServerAPI sapi) : base()
         {
             this.Sapi = sapi;
         }
-        public BlockEntityBooks(ICoreClientAPI capi):base()
+        public BlockEntityBooks(ICoreClientAPI capi) : base()
         {
             this.Capi = capi;
         }
@@ -59,22 +64,22 @@ namespace books.src
         public override void Initialize(ICoreAPI api)
         {
             base.Initialize(api);
-            this.Api = api; 
-
+            this.Api = api;
         }
-
 
         public void OnRightClick(IPlayer byPlayer)
         {
+
             if (byPlayer?.Entity?.Controls?.Sneak == true)
             {
-                ItemStack tempStack;
+                //ItemStack tempStack;
                 ItemSlot hotbarSlot = byPlayer.InventoryManager.ActiveHotbarSlot;
                 if ((hotbarSlot?.Itemstack?.ItemAttributes?["quillink"].Exists == true) || (hotbarSlot?.Itemstack?.ItemAttributes?["pen"].Exists == true))
                 {
+                    // TODO
                     if (hotbarSlot?.Itemstack?.ItemAttributes?["quillink"]?["color"].Exists == true)
                     {
-                        JsonObject jobj = hotbarSlot.Itemstack.ItemAttributes["quillink"]["color"];     // TODO 
+                        JsonObject jobj = hotbarSlot.Itemstack.ItemAttributes["quillink"]["color"];
                         int r, g, b;
                         r = jobj["red"].AsInt();
                         g = jobj["green"].AsInt();
@@ -82,19 +87,141 @@ namespace books.src
 
                         tempColor = ColorUtil.ToRgba(255, r, g, b);
                     }
-                    
+
                     tempStack = hotbarSlot.TakeOut(1);
                     hotbarSlot.MarkDirty();
-                     
-                    if (Api.Side != EnumAppSide.Client) return;
-                    Capi = (ICoreClientAPI)Api;
-                    int maxwidth = 120;
-                    int maxLines = 10;
-                    
-                    // TODO: GUI schreiben!
-                    //GuiDialogBlockEntityTextInput GUI = new GuiDialogBlockEntityTextInput( Title, Pos, Text, Capi, maxwidth, maxLines);
+
+                    //if (Api.Side != EnumAppSide.Client) return;
+                    //Capi = (ICoreClientAPI)Api;
+                    //int maxwidth = 120;
+                    //int maxLines = 10;
+
+                    // TODO: Add animation, see> ClientAnimator, maybe better animatorbase!
+                    // https://apidocs.vintagestory.at/api/Vintagestory.API.Common.AnimationManager.html#Vintagestory_API_Common_AnimationManager_StartAnimation_System_String_
+                    //
+                    // https://apidocs.vintagestory.at/api/Vintagestory.API.Client.GuiElementCustomDraw.html#Vintagestory_API_Client_GuiElementCustomDraw_OnMouseDownOnElement_Vintagestory_API_Client_ICoreClientAPI_Vintagestory_API_Client_MouseEvent_
+                    //
+                    // TODO: GUI with bg!
+
+                    // GuiDialogBlockEntityTextInput GUI = new GuiDialogBlockEntityTextInput(Title, Pos, Text, Capi, maxwidth, maxLines);
+                    // GUI.TryOpen();
+
+                    if (Api.World is IServerWorldAccessor)
+                    {
+                        byte[] data;
+
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            BinaryWriter writer = new BinaryWriter(ms);
+                            writer.Write("BlockEntityTextInput");
+                            writer.Write("Book Text");
+                            writer.Write(Text);
+                            data = ms.ToArray();
+                        }
+
+                        ((ICoreServerAPI)Api).Network.SendBlockEntityPacket(
+                            (IServerPlayer)byPlayer,
+                            Pos.X, Pos.Y, Pos.Z,
+                            (int)EnumBookPacketId.OpenDialog,
+                            data
+                        );
+                    }
                 }
             }
-        }    
+            else {
+                // just reading:
+                if (Api.Side != EnumAppSide.Client) return;
+                Capi = (ICoreClientAPI)Api;
+                //int maxwidth = 130;
+                //int maxLines = 4;
+                if (Text == null) Text = "";
+                if (Title == null) Title = "";
+                if (BGui == null) BGui = new BooksGui(Title, Text, Capi);
+                BGui.WriteGui(Title,Text, Pos, Capi);
+                BGui.TryOpen();
+            }
+        }
+
+        public override void OnReceivedClientPacket(IPlayer player, int packetid, byte[] data)
+        {
+            if (packetid == (int)EnumBookPacketId.SaveText)
+            {
+                using (MemoryStream ms = new MemoryStream(data))
+                {
+                    BinaryReader reader = new BinaryReader(ms);
+                    Text = reader.ReadString();
+                    if (Text == null) Text = "";
+                }
+
+                color = tempColor;
+
+                /*((ICoreServerAPI)api).Network.BroadcastBlockEntityPacket(
+                    pos.X, pos.Y, pos.Z,
+                    (int)EnumSignPacketId.NowText,
+                    data
+                );*/
+
+                MarkDirty(true);
+
+                // Tell server to save this chunk to disk again
+                Api.World.BlockAccessor.GetChunkAtBlockPos(Pos.X, Pos.Y, Pos.Z).MarkModified();
+
+                // 85% chance to get back the item
+                if (Api.World.Rand.NextDouble() < 0.85)
+                {
+                    player.InventoryManager.TryGiveItemstack(tempStack);
+                }
+            }
+
+            if (packetid == (int)EnumBookPacketId.CancelEdit && tempStack != null)
+            {
+                player.InventoryManager.TryGiveItemstack(tempStack);
+                tempStack = null;
+            }
+        }
+
+
+        public override void OnReceivedServerPacket(int packetid, byte[] data)
+        {
+            if (packetid == (int)EnumBookPacketId.OpenDialog)
+            {
+                using (MemoryStream ms = new MemoryStream(data))
+                {
+                    BinaryReader reader = new BinaryReader(ms);
+
+                    string dialogClassName = reader.ReadString();
+                    string dialogTitle = reader.ReadString();
+                    Text = reader.ReadString();
+                    if (Text == null) Text = "";
+                    IClientWorldAccessor clientWorld = (IClientWorldAccessor)Api.World;
+                    GuiDialogBlockEntityTextInput dlg = new GuiDialogBlockEntityTextInput(dialogTitle, Pos, Text, Api as ICoreClientAPI, 160);
+                    //dlg.OnTextChanged = DidChangeTextClientSide;
+                    dlg.OnCloseCancel = () =>
+                    {
+                        (Api as ICoreClientAPI).Network.SendBlockEntityPacket(Pos.X, Pos.Y, Pos.Z, (int)EnumBookPacketId.CancelEdit, null);
+                    };
+                    dlg.TryOpen();
+                }
+            }
+
+
+            if (packetid == (int)EnumBookPacketId.NowText)
+            {
+                using (MemoryStream ms = new MemoryStream(data))
+                {
+                    BinaryReader reader = new BinaryReader(ms);
+                    Text = reader.ReadString();
+                    if (Text == null) Text = "";
+                }
+            }
+        }
+    }
+    public enum EnumBookPacketId
+    {
+        NowText = 1000,
+        OpenDialog = 1001,
+        SaveText = 1002,
+        CancelEdit = 1003
+
     }
 }
