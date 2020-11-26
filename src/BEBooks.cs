@@ -137,8 +137,7 @@ namespace books.src
                 if (Text == null) Text = "";
                 if (Title == null) Title = "";
                 if (BGui == null) BGui = new BooksGui(Title, Text, Capi);
-                BGui.WriteGui(Title,Text, Pos, Capi);
-                BGui.TryOpen();
+                BGui.ReadGui(Title,Text, Pos, Capi);
             }
         }
 
@@ -194,13 +193,14 @@ namespace books.src
                     Text = reader.ReadString();
                     if (Text == null) Text = "";
                     IClientWorldAccessor clientWorld = (IClientWorldAccessor)Api.World;
-                    GuiDialogBlockEntityTextInput dlg = new GuiDialogBlockEntityTextInput(dialogTitle, Pos, Text, Api as ICoreClientAPI, 160);
+                    if (BGui == null) BGui = new BooksGui(Title, Text, Api as ICoreClientAPI);
+                    BGui.WriteGui(Title, Text, Pos, Api as ICoreClientAPI);
                     //dlg.OnTextChanged = DidChangeTextClientSide;
-                    dlg.OnCloseCancel = () =>
+                    BGui.OnCloseCancel = () =>
                     {
                         (Api as ICoreClientAPI).Network.SendBlockEntityPacket(Pos.X, Pos.Y, Pos.Z, (int)EnumBookPacketId.CancelEdit, null);
                     };
-                    dlg.TryOpen();
+                    BGui.TryOpen();
                 }
             }
 

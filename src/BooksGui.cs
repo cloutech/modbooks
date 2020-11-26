@@ -35,27 +35,32 @@ namespace books.src
         }
 
 
-        public void WriteGui(string title, string text, BlockPos Pos, ICoreClientAPI Capi)
+        public void WriteGui(string title, string text, BlockPos pos, ICoreClientAPI Capi)
         {
-            int maxLines = 12;
-            int maxWidth = 100;
-            ElementBounds textAreaBounds = ElementBounds.Fixed(0, 0, 300, 150);
+            this.BEPos = pos;
+
+            int WindowWidth = 600;
+            int WindowHeight = 400;
+            int maxLines = 10;
+            int maxWidth = 300;
+            ElementBounds textAreaBounds = ElementBounds.Fixed(0, 0, WindowWidth, WindowHeight);
             textareaFixedY = textAreaBounds.fixedY;
 
             // Clipping bounds for textarea
             ElementBounds clippingBounds = textAreaBounds.ForkBoundingParent().WithFixedPosition(0, 30);
 
             //ElementBounds scrollbarBounds = clippingBounds.CopyOffsetedSibling(textAreaBounds.fixedWidth + 3).WithFixedWidth(20);
-            ElementBounds AddPageButtonBounds = ElementBounds.FixedSize(0, 0).FixedUnder(clippingBounds, 2 * 2).WithAlignment(EnumDialogArea.LeftFixed).WithFixedPadding(10, 2);
-            ElementBounds SubPageButtonBounds = ElementBounds.FixedSize(0, 0).FixedUnder(clippingBounds, 2 * 2).WithAlignment(EnumDialogArea.LeftMiddle).WithFixedPadding(10, 2);
-            ElementBounds CancelButtonBounds = ElementBounds.FixedSize(0, 0).FixedUnder(clippingBounds, 2 * 5).WithAlignment(EnumDialogArea.RightMiddle).WithFixedPadding(10, 2);
+            ElementBounds AddPageButtonBounds = ElementBounds.FixedSize(0, 0).FixedUnder(clippingBounds, 2 * 5).WithFixedAlignmentOffset(((WindowWidth/2)-30), 0).WithFixedPadding(10, 2);
+            ElementBounds SubPageButtonBounds = ElementBounds.FixedSize(0, 0).FixedUnder(clippingBounds, 2 * 5).WithFixedAlignmentOffset(((WindowWidth/2)+30), 0).WithFixedPadding(10, 2);
+
+            ElementBounds CancelButtonBounds = ElementBounds.FixedSize(0, 0).FixedUnder(clippingBounds, 2 * 5).WithAlignment(EnumDialogArea.LeftFixed).WithFixedPadding(10, 2);
             ElementBounds SaveButtonBounds = ElementBounds.FixedSize(0, 0).FixedUnder(clippingBounds, 2 * 5).WithAlignment(EnumDialogArea.RightFixed).WithFixedPadding(10, 2);
 
 
             // 2. Around all that is 10 pixel padding
             ElementBounds bgBounds = ElementBounds.Fill.WithFixedPadding(GuiStyle.ElementToDialogPadding);
             bgBounds.BothSizing = ElementSizing.FitToChildren;
-            bgBounds.WithChildren(clippingBounds, CancelButtonBounds, SaveButtonBounds, AddPageButtonBounds, SubPageButtonBounds); //textAreaBounds, , scrollbarBounds
+            bgBounds.WithChildren(clippingBounds, CancelButtonBounds, SubPageButtonBounds, AddPageButtonBounds, SaveButtonBounds); //textAreaBounds, , scrollbarBounds
 
             // 3. Finally Dialog
             ElementBounds dialogBounds = ElementStdBounds.AutosizedMainDialog.WithAlignment(EnumDialogArea.RightMiddle)
@@ -73,7 +78,7 @@ namespace books.src
                     //.AddVerticalScrollbar(OnNewScrollbarvalue, scrollbarBounds, "scrollbar")
                     .AddSmallButton(Lang.Get("Cancel"), OnButtonCancel, CancelButtonBounds)
                     .AddSmallButton(Lang.Get("-"), OnButtonSub, SubPageButtonBounds)
-                    .AddSmallButton(Lang.Get("+"), OnButtonAdd, SubPageButtonBounds)
+                    .AddSmallButton(Lang.Get("+"), OnButtonAdd, AddPageButtonBounds)
                     .AddSmallButton(Lang.Get("Save"), OnButtonSave, SaveButtonBounds)
                 .EndChildElements()
                 .Compose()
@@ -82,9 +87,9 @@ namespace books.src
             SingleComposer.GetTextArea("text").SetMaxLines(maxLines);
             SingleComposer.GetTextArea("text").SetMaxWidth((int)(maxWidth * RuntimeEnv.GUIScale));
 
-            SingleComposer.GetScrollbar("scrollbar").SetHeights(
-                (float)textAreaBounds.fixedHeight, (float)textAreaBounds.fixedHeight
-            );
+            //SingleComposer.GetScrollbar("scrollbar").SetHeights(
+            //    (float)textAreaBounds.fixedHeight, (float)textAreaBounds.fixedHeight
+            //);
 
             if (Text.Length > 0)
             {
@@ -110,18 +115,18 @@ namespace books.src
         private void OnTextAreaChanged(string value)
         {
             GuiElementTextArea textArea = SingleComposer.GetTextArea("text");
-            SingleComposer.GetScrollbar("scrollbar").SetNewTotalHeight((float)textArea.Bounds.fixedHeight);
+            //SingleComposer.GetScrollbar("scrollbar").SetNewTotalHeight((float)textArea.Bounds.fixedHeight);
 
             OnTextChanged?.Invoke(textArea.GetText());
         }
-
+        /*
         private void OnNewScrollbarvalue(float value)
         {
             GuiElementTextArea textArea = SingleComposer.GetTextArea("text");
 
             textArea.Bounds.fixedY = 3 + textareaFixedY - value;
             textArea.Bounds.CalcWorldBounds();
-        }
+        }*/
 
 
         private void OnTitleBarClose()
@@ -160,9 +165,9 @@ namespace books.src
         }
 
 
-        public void ReadGui()
+        public void ReadGui(string title, string text, BlockPos Pos, ICoreClientAPI Capi)
         {
-
+            ClearComposers();
         }
 
 
