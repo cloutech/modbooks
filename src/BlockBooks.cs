@@ -22,7 +22,6 @@ namespace books.src
     {
 
         ICoreAPI Api;
-        BlockEntityBooks BEBooks = new BlockEntityBooks();
     
         WorldInteraction[] interactbook;
         public override void OnLoaded(ICoreAPI api)
@@ -39,7 +38,8 @@ namespace books.src
 
                 foreach (CollectibleObject collectible in api.World.Collectibles)
                 {
-                    if ((collectible.Attributes?["quillink"].Exists == true)||(collectible.Attributes?["pen"].Exists == true))
+                    if ((collectible.Attributes?["quillink"].Exists == true)
+                            ||(collectible.Attributes?["pen"].Exists == true))
                     {
                         stacksList.Add(new ItemStack(collectible));
                     }
@@ -73,11 +73,24 @@ namespace books.src
         {
             return interactbook.Append(base.GetPlacedBlockInteractionHelp(world, selection, forPlayer));
         }
-
+        /*
         public override void OnBlockPlaced(IWorldAccessor world, BlockPos blockPos, ItemStack byItemStack = null)
         {
             base.OnBlockPlaced(world, blockPos, byItemStack);
             BEBooks.Pos = blockPos;
+        }*/
+
+        public override void OnBlockBroken(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
+        {
+            base.OnBlockBroken(world, pos, byPlayer, dropQuantityMultiplier);
+            Block block = world
+                .BlockAccessor
+                .GetBlock(CodeWithParts("ground", "north"));
+
+            //TODO: 
+            // Wenn der Block bricht, in den Inv. des Spielers geben mit:
+                //  titel, Textinhalt gespeichert!
+
         }
 
     }

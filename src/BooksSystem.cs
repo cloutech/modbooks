@@ -58,9 +58,6 @@ namespace books.src
 
             ICoreClientAPI Capi = capi;
 
-            //BlockBooks BBooks = new BlockBooks();
-            //BlockEntityBooks BEBooks = new BlockEntityBooks(Capi);
-            //BooksGui BGui = new BooksGui(capi);
         }
 
         public override void StartServerSide(ICoreServerAPI sapi)
@@ -68,10 +65,6 @@ namespace books.src
             base.StartServerSide(sapi);
 
             ICoreServerAPI Sapi = sapi;
-
-            //BlockEntityBooks BEBooks = new BlockEntityBooks(Sapi);
-            //BlockBooks BBooks = new BlockBooks();
-
 
         }
 
