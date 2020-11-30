@@ -27,14 +27,15 @@ namespace books.src
             _bAdd = "+",
             _bNextPage = ">>",
             _bPrevPage = "<<";
-        private int
-            PageCurrent = 0,
-            PageMax = 0;
+        private int PageCurrent = 0;
+        public int PageMax { get; private set; }
+
         private static int
             MaxTitleWidth = 240,
-            MaxLines = 19,
+            MaxLines = 18,
             MaxWidth = 580,
-            PageLimit = 10,
+            // PageLimit, how many pages players can have in a book
+            PageLimit = 50,
             PageNumberingFont = 18,
             PageNumberingHeight = 20,
             PageNumberingWidth = 50,
@@ -57,28 +58,33 @@ namespace books.src
         public Action OnCloseCancel;
 
         bool didSave;
-        public BooksGui(string title, string[] text, ICoreClientAPI capi) : base(title, capi)
+
+        public BooksGui(string title, string[] text, int pagemax, ICoreClientAPI capi) : base(title, capi)
         {
-            InitlizingText();
-            this.Title = title;
+            Capi = capi;
+            Title = title;
+            PageMax = pagemax;
+            //DeletingText();
             text.CopyTo(Text, 0);
-            this.Capi = capi;
-        }
-        public BooksGui(string title, string[] text, BlockPos BlockEntityPosition, ICoreClientAPI capi) : base(title, capi)
-        {
-            InitlizingText();
-            this.Title = title;
-            text.CopyTo(Text, 0);
-            this.BEPos = BlockEntityPosition;
-            this.Capi = capi;
         }
 
-        private void InitlizingText()
+        public BooksGui(string title, string[] text, int pagemax, BlockPos BlockEntityPosition, ICoreClientAPI capi) : base(title, capi)
         {
-            for (int i = 0; i < PageMax; i++)
+            Capi = capi;
+            BEPos = BlockEntityPosition;
+            Title = title;
+            PageMax = pagemax;
+            //DeletingText();
+            text.CopyTo(Text, 0);
+        }
+
+        private void DeletingText()
+        {
+            for (int i = 0; i < PageLimit; i++)
             {
-                this.Text[i] = "";
+                Text[i] = "";
             }
+            Text[0] = "Your text";
         }
 
         private void UpdatingCurrentPageNumbering()
@@ -109,7 +115,18 @@ namespace books.src
                 .SetNewText(CurrentPageNumbering, false, true, false);
         }
 
-        public void WriteGui(string title, string[] text, BlockPos pos, ICoreClientAPI Capi)
+        private bool SavingInputTemporary()
+        {
+            Title = SingleComposer
+                .GetTextInput(IDTitleInput)
+                .GetText();
+            Text[PageCurrent] = SingleComposer
+                .GetTextArea(IDTextArea)
+                .GetText();
+            return true;
+        }
+
+        public void WriteGui(BlockPos pos, ICoreClientAPI Capi)
         {
             ElementBounds
                 TitleAreaBounds = ElementBounds
@@ -232,52 +249,63 @@ namespace books.src
                     .GetDynamicText(IDPageArea)
                     .SetNewText(CurrentPageNumbering,false,true,false);
             }
+            UpdatingCurrentPageNumbering();
         }
 
-        private bool OnButtonNextPage(){
+        private bool OnButtonNextPage()
+        {
+            SavingInputTemporary();
             if (PageCurrent < PageMax)
             {
                 PageCurrent += 1;
                 UpdatingCurrentPageNumbering();
-                // TODO Fix SingleComposer redraw with next page content
 
             }
+            SingleComposer
+                .GetTextArea(IDTextArea)
+                .SetValue(Text[PageCurrent]);
             return true;
         }
+
         private bool OnButtonPrevPage()
         {
+            SavingInputTemporary();
             if (PageCurrent > 0)
             {
                 PageCurrent -= 1;
                 UpdatingCurrentPageNumbering();
-                // TODO Fix SingleComposer redraw with prev page content
-
             }
+            SingleComposer
+                .GetTextArea(IDTextArea)
+                .SetValue(Text[PageCurrent]);
             return true;
         }
 
         private bool OnButtonSub(){
             if (PageMax > 0)
             {
+                Text[PageMax] = "";
                 PageMax -= 1;
-                // Need to return to prev. page if current displayed lastpage was deleted
-                if(PageCurrent > PageMax)
+                // Need to return to prev. page if currently displayed lastpage was deleted
+                if (PageCurrent > PageMax)
                 {
+                    SingleComposer
+                        .GetTextArea(IDTextArea)
+                        .SetValue(Text[PageMax+1]);
                     OnButtonPrevPage();
                     return true;
                 }
-
+                
                 UpdatingCurrentPageNumbering();
-
             }
             return true;
         }
+
         private bool OnButtonAdd()
         {
             if (PageMax < (PageLimit - 1))
             {
                 PageMax += 1;
-
                 UpdatingCurrentPageNumbering();
 
             }
@@ -314,18 +342,20 @@ namespace books.src
             OnButtonCancel();
         }
 
+        // OnButtonSave commits text to block
         private bool OnButtonSave()
         {
-            GuiElementTextInput TitleArea = SingleComposer.GetTextInput(IDTitleInput);
-            GuiElementTextArea TextArea = SingleComposer.GetTextArea(IDTextArea);
-
+            SavingInputTemporary();
             byte[] data;
-
             using (MemoryStream ms = new MemoryStream())
             {
                 BinaryWriter writer = new BinaryWriter(ms);
-                writer.Write(TextArea.GetText());
-                writer.Write(TitleArea.GetText());
+                writer.Write(PageMax);
+                for (int i = 0; i <= PageMax; i++)
+                {
+                    writer.Write(Text[i]);
+                }
+                writer.Write(Title);
                 data = ms.ToArray();
             }
             capi
@@ -349,7 +379,7 @@ namespace books.src
             base.OnGuiClosed();
         }
 
-        public void ReadGui(string title, string text, BlockPos Pos, ICoreClientAPI Capi)
+        public void ReadGui( BlockPos Pos, ICoreClientAPI Capi)
         {
             this.BEPos = Pos;
 

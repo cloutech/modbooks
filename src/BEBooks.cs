@@ -24,17 +24,19 @@ namespace books.src
         public ICoreClientAPI Capi;
         public ICoreServerAPI Sapi;
 
-        static string 
+        private static string
             flag_R = "R",
-            flag_W = "W";
-
-        private string[]
-            arText = {"Your text","","","","","","","","",""}, //10, for debug
-            arPageNames = {"page1","page2","page3", "page4","page5","page6","page7","page8","page9", "page10"};
-        private string Title = "Your title";
+            flag_W = "W",
+            NetworkName = "BlockEntityTextInput";
         private int
-            PageCurrent = 0,
-            PageMax = 9;
+            PageMax = 0;
+        private static int
+            PageLimit = 50;
+        private string[]
+            arText = new string[PageLimit],
+            arPageNames = new string[PageLimit];
+        private string Title = "Your title";
+
 
         ItemStack tempStack;
 
@@ -42,14 +44,13 @@ namespace books.src
 
         public BlockEntityBooks(BlockPos blockPos) : base()
         {
-            SetText();
-
+            DeletingText();
             this.Pos = blockPos;
         }
         
         public BlockEntityBooks(BlockPos blockPos, string title, string[] text) : base()
         {
-            SetText();
+            DeletingText();
             this.Pos = blockPos;
             this.arText = text;
             this.Title = title;
@@ -57,49 +58,72 @@ namespace books.src
 
         public BlockEntityBooks(ICoreServerAPI sapi) : base()
         {
-            SetText();
-
+            DeletingText();
             this.Sapi = sapi;
         }
         public BlockEntityBooks(ICoreClientAPI capi) : base()
         {
-            SetText();
-
+            DeletingText();
             this.Capi = capi;
         }
 
-        private void SetText()
+        private void NamingPages()
+        {
+            // naming for saving in tree attributes, e.g. page1
+            string
+                updatedPageName = "page",
+                temp_numbering = "";
+
+            for (int i = 1; i <= PageLimit; i++)
+            {
+                temp_numbering = i.ToString();
+                arPageNames[i-1] = string.Concat(
+                    updatedPageName,
+                    temp_numbering
+                    );
+            }
+       }
+
+        private void DeletingText()
         {
             for (int i = 0; i < PageMax; i++)
             {
                 this.arText[i] = "";
             }
+            this.arText[0] = "Your text";
         }
 
         public override void Initialize(ICoreAPI api)
         {
             base.Initialize(api);
             this.Api = api;
+            NamingPages();
+            DeletingText();
         }
 
         public override void FromTreeAtributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
         {
             base.FromTreeAtributes(tree, worldForResolving);
+            PageMax = tree.GetInt("PageMax",1);
+            Title = tree.GetString("title");
+            NamingPages();
             for (int i = 0; i < PageMax; i++)
             {
                 arText[i] = tree.GetString(arPageNames[i], "");
             }
-            Title = tree.GetString("title", "");
+
         }
 
         public override void ToTreeAttributes(ITreeAttribute tree)
         {
             base.ToTreeAttributes(tree);
+            NamingPages();
+            tree.SetInt("PageMax", PageMax);
+            tree.SetString("title", Title);
             for (int i = 0; i < PageMax; i++)
             {
                 tree.SetString(arPageNames[i], arText[i]);
             }
-            tree.SetString("title", Title);
         }
 
         public void OnRightClick(IPlayer byPlayer)
@@ -126,10 +150,13 @@ namespace books.src
                 using (MemoryStream ms = new MemoryStream())
                 {
                     BinaryWriter writer = new BinaryWriter(ms);
-                    writer.Write("BlockEntityTextInput");
+                    writer.Write(NetworkName);
+                    writer.Write(PageMax);
+                    for (int i = 0; i <= PageMax; i++)
+                    {
+                        writer.Write(arText[i]);
+                    }
                     writer.Write(Title);
-                    //TODO
-                    writer.Write(arText[PageCurrent]);
                     writer.Write(controlRW);
                     data = ms.ToArray();
                 }
@@ -168,8 +195,11 @@ namespace books.src
                 using (MemoryStream ms = new MemoryStream(data))
                 {
                     BinaryReader reader = new BinaryReader(ms);
-                    // TODO:
-                    arText[PageCurrent] = reader.ReadString();
+                    PageMax = reader.ReadInt32();
+                    for (int i = 0; i <= PageMax; i++)
+                    {
+                        arText[i] = reader.ReadString();
+                    }
                     Title = reader.ReadString();
                 }
                 MarkDirty(true);
@@ -192,17 +222,21 @@ namespace books.src
                     BinaryReader reader = new BinaryReader(ms);
 
                     string dialogClassName = reader.ReadString();
+                    PageMax = reader.ReadInt32();
+                    for (int i = 0; i <= PageMax; i++)
+                    {
+                        arText[i] = reader.ReadString();
+                    }
                     Title = reader.ReadString();
-                    //TODO fix array
-                    arText[PageCurrent] = reader.ReadString();
-                    string controlRW = reader.ReadString(); 
+                    string controlRW = reader.ReadString();
+                     
                     IClientWorldAccessor clientWorld = (IClientWorldAccessor)Api.World;
 
-                    BooksGui BGui = new BooksGui(Title, arText, Api as ICoreClientAPI);
+                    BooksGui BGui = new BooksGui(Title, arText, PageMax, Api as ICoreClientAPI);
                     if(controlRW.Equals(flag_W))
-                        BGui.WriteGui(Title, arText, Pos, Api as ICoreClientAPI);
-                    else //TODO fix array
-                        BGui.ReadGui(Title, arText[PageCurrent], Pos, Api as ICoreClientAPI);
+                        BGui.WriteGui(Pos, Api as ICoreClientAPI);
+                    else
+                        BGui.ReadGui(Pos, Api as ICoreClientAPI);
 
                     BGui.OnCloseCancel = () =>
                     {
@@ -217,21 +251,25 @@ namespace books.src
                 }
             }
 
-
+            /*
             if (packetid == (int)EnumBookPacketId.NowText)
             {
                 using (MemoryStream ms = new MemoryStream(data))
                 {
                     BinaryReader reader = new BinaryReader(ms);
-                    //TODO fix array networking
-                    arText[PageCurrent] = reader.ReadString();
+                    PageMax = reader.ReadInt32();
+                    for (int i = 0; i < PageMax; i++)
+                    {
+                        arText[i] = reader.ReadString();
+                    }
+                    Title = reader.ReadString();
                 }
-            }
+            }*/
         }
     }
     public enum EnumBookPacketId
     {
-        NowText = 1000,
+        //NowText = 1000,
         OpenDialog = 1001,
         SaveBook = 1002,
         CancelEdit = 1003
