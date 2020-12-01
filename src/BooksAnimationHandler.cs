@@ -10,6 +10,7 @@ using Vintagestory.API.MathTools;
 
 namespace books.src
 {
+    // TODO: Include animation handler for reading/editing books
     class BooksAnimationHandler
     {
 

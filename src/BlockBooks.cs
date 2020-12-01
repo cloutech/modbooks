@@ -47,7 +47,8 @@ namespace books.src
 
                 return new WorldInteraction[] { new WorldInteraction()
                     {
-                        ActionLangCode = "blockhelp-sign-write", // in: game\lang\en.jfson ="Write text",
+                        // in: game\lang\en.jfson ="Write text",
+                        ActionLangCode = "blockhelp-sign-write", 
                         HotKeyCode = "sneak",
                         MouseButton = EnumMouseButton.Right,
                         Itemstacks = stacksList.ToArray()

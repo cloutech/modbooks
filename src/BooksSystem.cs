@@ -35,7 +35,7 @@ namespace books.src
             return true;
         }
 
-        public override void Start(ICoreAPI api) // starts client and server side!
+        public override void Start(ICoreAPI api) 
         {
             base.Start(api);
             
@@ -43,12 +43,6 @@ namespace books.src
             api.RegisterBlockEntityClass("BlockEntityBooks", typeof(BlockEntityBooks)); 
             api.RegisterBlockClass("inkpot", typeof(BlockInkpot));
             api.RegisterItemClass("itemquill", typeof(ItemQuill));
-
-            // TODO : needs new shape
-            //api.RegisterBlockClass("booksquills", typeof(BlockBooksQuills)); 
-
-            //BlockBooks BBooks = new BlockBooks();
-            // TODO : NetworkHandler NetworkHandler = new NetworkHandler();
 
         }
 
