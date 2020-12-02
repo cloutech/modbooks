@@ -36,22 +36,27 @@ namespace books.src
             WindowHeight = 400;
 
         private string
-            Title = "Your title",
-            CurrentPageNumbering = "1/1";
+            Title = "",
+            CurrentPageNumbering = "1/1",
+            EditTitle = "",
+            _bCancel = "",
+            _bSave = "",
+            _bClose = "";
 
         private static string
+            //LangText = "books:editor-text-default",
+            //LangTitel = "books:editor-titel-default",
+            LangTitelEditor = "books:editor-titel",
+            LangbCancel = "books:editor-cancel",
+            LangbSave = "books:editor-save",
+            LangbClose = "books:editor-close",
             DialogNameEditor = "bookeditor",
-            //DialogNameReader = "bookreader",
             CompNameRead = "blockentitytextreaddialog",
             CompNameEdit = "blockentitytexteditordialog",
-            EditTitle = "Book Editor",
             IDTextArea = "text",
             IDRichtextArea = "page",
             IDTitleInput = "title",
             IDPageArea = "page-numbering",
-            _bCancel = "Cancel",
-            _bSave = "Save",
-            _bClose = "Close",
             _bSub = "-",
             _bAdd = "+",
             _bNextPage = ">>",
@@ -64,14 +69,24 @@ namespace books.src
         public Action<string> OnTextChanged;
         public Action OnCloseCancel;
 
-        bool didSave;
+        public bool didSave;
+        public bool unique = false;
+        
 
         public BooksGui(string booktitle, string[] text, int pagemax, ICoreClientAPI capi, string dialogTitel) : base(dialogTitel, capi)
         {
             Capi = capi;
-            Title = booktitle;
             PageMax = pagemax;
+
+            EditTitle = Lang.Get(LangTitelEditor);
+            _bCancel = Lang.Get(LangbCancel);
+            _bSave = Lang.Get(LangbSave);
+            _bClose = Lang.Get(LangbClose);
+
+            Title = booktitle;
+            DeletingText();
             text.CopyTo(Text, 0);
+
         }
 
         public BooksGui(string booktitle, string[] text, int pagemax, BlockPos BlockEntityPosition, ICoreClientAPI capi, string dialogTitel) : base(dialogTitel, capi)
@@ -85,11 +100,11 @@ namespace books.src
 
         private void DeletingText()
         {
+            Text[0] = "";
             for (int i = 0; i < PageLimit; i++)
             {
                 Text[i] = "";
             }
-            Text[0] = "Your text";
         }
 
         private void UpdatingText()
@@ -410,6 +425,7 @@ namespace books.src
                     .SendBlockEntityPacket(BEPos.X, BEPos.Y, BEPos.Z, (int)EnumBookPacketId.SaveBook, data);
 
                 didSave = true;
+                unique = true;
                 TryClose();
             }
             return true;

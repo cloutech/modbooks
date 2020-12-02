@@ -24,21 +24,26 @@ namespace books.src
         public ICoreClientAPI Capi;
         public ICoreServerAPI Sapi;
 
+        public int
+            PageMax = 1;
+        private static int
+            PageLimit = 20;
         private static string
+            IDDialogBookEditor = "bookeditor",
+            IDDialogBookReader = "bookeader",
             flag_R = "R",
             flag_W = "W",
             NetworkName = "BlockEntityTextInput";
-        private int
-            PageMax = 0;
-        private static int
-            PageLimit = 20;
-        private string[]
+        public string[]
             arText = new string[PageLimit],
             arPageNames = new string[PageLimit];
-        private string Title = "Your title";
+        public string Title = "";
 
+        public bool unique = false;
 
         ItemStack tempStack;
+
+        BlockBooks ownBook;
 
         public BlockEntityBooks() : base() { }
 
@@ -67,7 +72,7 @@ namespace books.src
             this.Capi = capi;
         }
 
-        private void NamingPages()
+        public void NamingPages()
         {
             // naming for saving in tree attributes, e.g. page1
             string
@@ -84,9 +89,9 @@ namespace books.src
             }
        }
 
-        private void DeletingText()
+        public void DeletingText()
         {
-            for (int i = 0; i < PageMax; i++)
+            for (int i = 0; i < PageLimit; i++)
             {
                 this.arText[i] = "";
             }
@@ -96,9 +101,9 @@ namespace books.src
         public override void Initialize(ICoreAPI api)
         {
             base.Initialize(api);
+            this.ownBook = Block as BlockBooks;
             this.Api = api;
             NamingPages();
-            DeletingText();
         }
 
         public override void FromTreeAtributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
@@ -106,8 +111,11 @@ namespace books.src
             base.FromTreeAtributes(tree, worldForResolving);
             // TODO: rewrite to only send data on read
             // only always load title info!
+
             PageMax = tree.GetInt("PageMax",1);
-            Title = tree.GetString("title");
+            Title = tree.GetString("title", "Your title");
+            if (arPageNames[0] == null)
+                NamingPages();
             for (int i = 0; i < PageMax; i++)
             {
                 arText[i] = tree.GetString(arPageNames[i], "");
@@ -118,24 +126,35 @@ namespace books.src
         public override void ToTreeAttributes(ITreeAttribute tree)
         {
             base.ToTreeAttributes(tree);
-            // TODO: rewrite to only send data on read
-            // only always load title info!
             tree.SetInt("PageMax", PageMax);
             tree.SetString("title", Title);
+            if (arPageNames[0] == null)
+                NamingPages();
+            // TODO: rewrite to only send data on read
+            // only always load title and maxpage number info!
             for (int i = 0; i < PageMax; i++)
             {
                 tree.SetString(arPageNames[i], arText[i]);
             }
         }
 
+
+
         public void OnRightClick(IPlayer byPlayer)
         {
             string controlRW = flag_R;
 
+            // TODO: Add animation, see> ClientAnimator, maybe better animatorbase!
+            // https://apidocs.vintagestory.at/api/Vintagestory.API.Common.AnimationManager.html#Vintagestory_API_Common_AnimationManager_StartAnimation_System_String_
+            //
+            // https://apidocs.vintagestory.at/api/Vintagestory.API.Client.GuiElementCustomDraw.html#Vintagestory_API_Client_GuiElementCustomDraw_OnMouseDownOnElement_Vintagestory_API_Client_ICoreClientAPI_Vintagestory_API_Client_MouseEvent_
+            //
+            
+
             if (byPlayer?.Entity?.Controls?.Sneak == true)
             {
                 ItemSlot hotbarSlot = byPlayer.InventoryManager.ActiveHotbarSlot;
-                if ((hotbarSlot?.Itemstack?.ItemAttributes?["quillink"].Exists == true) 
+                if ((hotbarSlot?.Itemstack?.ItemAttributes?["quillink"].Exists == true)
                         || (hotbarSlot?.Itemstack?.ItemAttributes?["pen"].Exists == true))
                 {
                     tempStack = hotbarSlot.TakeOut(1);
@@ -153,7 +172,7 @@ namespace books.src
                     BinaryWriter writer = new BinaryWriter(ms);
                     writer.Write(NetworkName);
                     writer.Write(PageMax);
-                    for (int i = 0; i <= PageMax; i++)
+                    for (int i = 0; i < PageMax; i++)
                     {
                         writer.Write(arText[i]);
                     }
@@ -169,11 +188,7 @@ namespace books.src
                             data
                         );
             }
-            // TODO: Add animation, see> ClientAnimator, maybe better animatorbase!
-            // https://apidocs.vintagestory.at/api/Vintagestory.API.Common.AnimationManager.html#Vintagestory_API_Common_AnimationManager_StartAnimation_System_String_
-            //
-            // https://apidocs.vintagestory.at/api/Vintagestory.API.Client.GuiElementCustomDraw.html#Vintagestory_API_Client_GuiElementCustomDraw_OnMouseDownOnElement_Vintagestory_API_Client_ICoreClientAPI_Vintagestory_API_Client_MouseEvent_
-            //
+
         }
 
         public override void OnReceivedClientPacket(IPlayer player, int packetid, byte[] data)
@@ -192,6 +207,8 @@ namespace books.src
                     Title = reader.ReadString();
                 }
                 NamingPages();
+                
+                unique = true;
                 MarkDirty(true);
                 Api.World.BlockAccessor.GetChunkAtBlockPos(Pos.X, Pos.Y, Pos.Z).MarkModified();
             }
@@ -205,7 +222,7 @@ namespace books.src
 
         public override void OnReceivedServerPacket(int packetid, byte[] data)
         {
-            // TODO: populate BooksNetworkHandler, sloppy:
+            // TODO: populate BooksNetworkHandler, sloppy for now:
             if (packetid == (int)EnumBookPacketId.OpenDialog)
             {
                 using (MemoryStream ms = new MemoryStream(data))
@@ -214,7 +231,7 @@ namespace books.src
 
                     string dialogClassName = reader.ReadString();
                     PageMax = reader.ReadInt32();
-                    for (int i = 0; i <= PageMax; i++)
+                    for (int i = 0; i < PageMax; i++)
                     {
                         arText[i] = reader.ReadString();
                     }
@@ -225,7 +242,7 @@ namespace books.src
 
                     if (controlRW.Equals(flag_W))
                     {
-                        BooksGui BGuiWrite = new BooksGui(Title, arText, PageMax, Api as ICoreClientAPI, "bookeditor");
+                        BooksGui BGuiWrite = new BooksGui(Title, arText, PageMax, Api as ICoreClientAPI, IDDialogBookEditor);
                         BGuiWrite.WriteGui(Pos, Api as ICoreClientAPI);
                         BGuiWrite.OnCloseCancel = () =>
                         {
@@ -239,7 +256,7 @@ namespace books.src
                         BGuiWrite.TryOpen();
                     }
                     else {
-                        BooksGui BGuiRead = new BooksGui(Title, arText, PageMax, Api as ICoreClientAPI, "bookreader");
+                        BooksGui BGuiRead = new BooksGui(Title, arText, PageMax, Api as ICoreClientAPI, IDDialogBookReader);
                         BGuiRead.ReadGui(Pos, Api as ICoreClientAPI);
                         BGuiRead.OnCloseCancel = () =>
                         {
