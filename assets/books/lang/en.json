@@ -1,7 +1,17 @@
 {
 	"books:block-books-north": "Book",
+
 	"books:block-bookwithinkpot-north" : "Book and Inkpot",
 	"books:block-inkpot": "Inkpot",
 	"books:block-booksquills-north":"Quill",
 	"books:item-itemquill" : "Quill",
+	
+	"books:editor-titel": "Book Editor",
+	"books:editor-titel-default": "",
+	"books:editor-text-default": "",
+	"books:editor-cancel": "Cancel",
+	"books:editor-save": "Save",
+	"books:editor-close": "Close",
+	
+	
 }

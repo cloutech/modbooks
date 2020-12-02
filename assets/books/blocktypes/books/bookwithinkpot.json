@@ -1,5 +1,5 @@
 {
-	code: "bookwithinkpot",
+	code: "bookshinkpot",
 	class: "BlockBooks",
 	entitycass: "BlockEntityBooks", 
 	blockmaterial: "wood",
@@ -15,7 +15,8 @@
 		all: false
 	},
 	materialDensity: 600,
-	behaviors: [ {name: "HorizontalOrientable"},{ "name": "Unstable" },entityBehaviors: { name: "Animatable" } ],
+	behaviors: [ {name: "HorizontalOrientable"},{ "name": "Unstable" }],
+	entityBehaviors: [{ name: "Animatable" } ],
 	variantgroups: [
 		{ code: "side", loadFromProperties: "abstract/horizontalorientation" }
 	],

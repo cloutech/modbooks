@@ -1,10 +1,10 @@
 {
 	code: "books",
 	class: "BlockBooks",
-	entitycass: "BlockEntityBooks",
+	entityClass: "BlockEntityBooks",
 	blockmaterial: "wood",
 	drawtype:"json",
-	maxstacksize: 64,
+	maxstacksize: 1,
 	resistance: 1.5,
 	lightabsorption: 0,
 	ambientocclusion: true,
@@ -12,7 +12,7 @@
 	sideopaque: "all",
 	rainPermeable: false,
 	materialDensity: 600,
-	behaviors: [ {name: "HorizontalOrientable"},{ "name": "Unstable" } ],
+	behaviors: [ {name: "HorizontalOrientable"},{ "name": "Unstable" }, { name: "Animatable" } ],
 	variantgroups: [
 		{ code: "side", loadFromProperties: "abstract/horizontalorientation" }
 	],
