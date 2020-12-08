@@ -1,5 +1,5 @@
 {
-	code: "books",
+	code: "papers",
 	class: "BlockBooks",
 	entityClass: "BlockEntityBooks",
 	blockmaterial: "wood",
@@ -13,8 +13,6 @@
 	rainPermeable: true,
 	materialDensity: 600,
 	behaviors: [ {name: "HorizontalOrientable"}],
-	entityBehavior: [{name:"Animatable"}],
-	heldTpIdleAnimation: "holdunderarm",
 	variantgroups: [
 		{ code: "side", loadFromProperties: "abstract/horizontalorientation" }
 	],
@@ -22,19 +20,18 @@
 	{ "loadFromProperties": "abstract/horizontalorientation" } 
 	],
 	textures: {
-      "pages": { base: "block/books/pages" },
-	  "books": { base: "block/books/books" },
+      "pages": { base: "block/books/papers" },
     },
 	shapebytype: {
-		"*-north": { base: "block/books/books", rotateY: 0 },
-		"*-east": { base: "block/books/books", rotateY: 270 },
-		"*-south": { base: "block/books/books", rotateY: 180 },
-		"*-west": { base: "block/books/books", rotateY: 90 },
+		"*-north": { base: "block/books/papers", rotateY: 0 },
+		"*-east": { base: "block/books/papers", rotateY: 270 },
+		"*-south": { base: "block/books/papers", rotateY: 180 },
+		"*-west": { base: "block/books/papers", rotateY: 90 },
 	},
 	creativeinventory: { "general": ["*-north"], "decorative": ["*-north"] },
 	
 	shapeinventory: {
-		base: "block/books/inv_books"
+		base: "block/books/inv_papers"
 	},
 	sidesolid: {
 		all: "false"
@@ -44,7 +41,7 @@
 	},
 	combustibleProps: {
 		burnTemperature: 600,
-		burnDuration: 12,
+		burnDuration: 5,
 	},
 	sounds: {
 		"place": "block/planks",
