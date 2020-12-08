@@ -4,6 +4,11 @@ using Vintagestory.API.Config;
 using Vintagestory.API.MathTools;
 using Vintagestory.API.Common;
 
+// TODO: nicer background!
+// TODO: onRead send TreeAttributes of arText only (decrease networking)
+// Feat1: Help-Tab for book, shows more info on format, features etc.
+// Feat2: Add waypoint sharing support?
+
 namespace books.src
 {
     class BooksGui : GuiDialogGeneric
@@ -39,17 +44,24 @@ namespace books.src
             Title = "",
             CurrentPageNumbering = "1/1",
             EditTitle = "",
+            // button texts:
             _bCancel = "",
             _bSave = "",
-            _bClose = "";
+            _bClose = "",
+            _bHelp = "";
+
 
         private static string
+            // Language en.json references:
             //LangText = "books:editor-text-default",
             //LangTitel = "books:editor-titel-default",
             LangTitelEditor = "books:editor-titel",
             LangbCancel = "books:editor-cancel",
             LangbSave = "books:editor-save",
             LangbClose = "books:editor-close",
+            LangbHelp = "books:editor-help",
+            //LangHelpText = "books:editor-help-text",
+            // IDs/dialog keys:
             DialogNameEditor = "bookeditor",
             CompNameRead = "blockentitytextreaddialog",
             CompNameEdit = "blockentitytexteditordialog",
@@ -57,6 +69,7 @@ namespace books.src
             IDRichtextArea = "page",
             IDTitleInput = "title",
             IDPageArea = "page-numbering",
+            //IDHelpArea = "help-page",
             _bSub = "-",
             _bAdd = "+",
             _bNextPage = ">>",
@@ -70,36 +83,42 @@ namespace books.src
         public Action OnCloseCancel;
 
         public bool didSave;
-        public bool unique = false;
-        
+        public bool Unique = false;
 
-        public BooksGui(string booktitle, string[] text, int pagemax, ICoreClientAPI capi, string dialogTitel) : base(dialogTitel, capi)
+        public BooksGui(bool unique, string booktitle, string[] text, int pagemax, ICoreClientAPI capi, string dialogTitel) : base(dialogTitel, capi)
         {
             Capi = capi;
             PageMax = pagemax;
+            GetLangEntries();
+            Title = booktitle;
+            DeletingText();
+            text.CopyTo(Text, 0);
+            Unique = unique;
+        }
 
+        public BooksGui(bool unique, string booktitle, string[] text, int pagemax, BlockPos BlockEntityPosition, ICoreClientAPI capi, string dialogTitel) : base(dialogTitel, capi)
+        {
+            Capi = capi;
+            BEPos = BlockEntityPosition;
+            GetLangEntries();
+            Title = booktitle;
+            PageMax = pagemax;
+            text.CopyTo(Text, 0);
+            Unique = unique;
+        }
+
+        private void GetLangEntries()
+        {
             EditTitle = Lang.Get(LangTitelEditor);
             _bCancel = Lang.Get(LangbCancel);
             _bSave = Lang.Get(LangbSave);
             _bClose = Lang.Get(LangbClose);
-
-            Title = booktitle;
-            DeletingText();
-            text.CopyTo(Text, 0);
-
-        }
-
-        public BooksGui(string booktitle, string[] text, int pagemax, BlockPos BlockEntityPosition, ICoreClientAPI capi, string dialogTitel) : base(dialogTitel, capi)
-        {
-            Capi = capi;
-            BEPos = BlockEntityPosition;
-            Title = booktitle;
-            PageMax = pagemax;
-            text.CopyTo(Text, 0);
+            _bHelp = Lang.Get(LangbHelp);
         }
 
         private void DeletingText()
         {
+            Unique = false;
             Text[0] = "";
             for (int i = 0; i < PageLimit; i++)
             {
@@ -133,7 +152,7 @@ namespace books.src
             // Display purpose only: 1 to PageMax+1 instead of 0 to PageMax, e.g. 0/9 is 1/10
             temp_page = PageCurrent + 1;
             currentPage = temp_page.ToString();
-            temp_page = PageMax + 1;
+            temp_page = PageMax;
             lastPage = temp_page.ToString();
 
             updatedCurrentPageNumbering = string.Concat(
@@ -166,7 +185,7 @@ namespace books.src
                 Text[PageCurrent] = Composers[CompNameEdit]
                     .GetTextArea(IDTextArea)
                     .GetText();
-            } 
+            }
             return true;
         }
 
@@ -183,12 +202,12 @@ namespace books.src
                 AddPageButtonBounds = ElementBounds
                     .FixedSize(0, 0)
                     .FixedUnder(ClippingBounds, 2 * 5)
-                    .WithFixedAlignmentOffset(((WindowWidth/2)+10), 0)
+                    .WithFixedAlignmentOffset(((WindowWidth / 2) + 10), 0)
                     .WithFixedPadding(3, 2),
                 SubPageButtonBounds = ElementBounds
                     .FixedSize(0, 0)
                     .FixedUnder(ClippingBounds, 2 * 5)
-                    .WithFixedAlignmentOffset(((WindowWidth/2)-10), 0)
+                    .WithFixedAlignmentOffset(((WindowWidth / 2) - 10), 0)
                     .WithFixedPadding(4, 2),
                 CancelButtonBounds = ElementBounds
                     .FixedSize(0, 0).FixedUnder(ClippingBounds, 2 * 5)
@@ -225,7 +244,7 @@ namespace books.src
 
             //flag_RW = flag_W;
 
-            bgBounds.BothSizing = ElementSizing.FitToChildren; 
+            bgBounds.BothSizing = ElementSizing.FitToChildren;
             bgBounds.WithChildren(
                 ClippingBounds,
                 CancelButtonBounds,
@@ -242,16 +261,16 @@ namespace books.src
                 .AddShadedDialogBG(bgBounds)
                 .AddDialogTitleBar(EditTitle, OnTitleBarClose)
                 .AddTextInput(
-                    TitleAreaBounds, 
-                    OnTitleAreaChanged, 
-                    CairoFont.TextInput().WithFontSize(TitleFont), 
+                    TitleAreaBounds,
+                    OnTitleAreaChanged,
+                    CairoFont.TextInput().WithFontSize(TitleFont),
                     IDTitleInput)
                 .BeginChildElements(bgBounds)
                     .BeginClip(ClippingBounds)
                         .AddTextArea(
-                            TextAreaBounds, 
-                            OnTextAreaChanged, 
-                            CairoFont.TextInput().WithFontSize(TextFont), 
+                            TextAreaBounds,
+                            OnTextAreaChanged,
+                            CairoFont.TextInput().WithFontSize(TextFont),
                             IDTextArea)
                     .EndClip()
                     .AddSmallButton(Lang.Get(_bCancel), OnButtonCancel, CancelButtonBounds)
@@ -280,27 +299,30 @@ namespace books.src
                 .GetTextInput(IDTitleInput)
                     .SetMaxWidth(MaxTitleWidth);
 
-            if (Text.Length > 0){
+            if (Text.Length > 0)
+            {
                 Composers[CompNameEdit]
                   .GetTextArea(IDTextArea)
                     .SetValue(Text[PageCurrent]);
             }
-            if (Title.Length > 0){
+            if (Title.Length > 0)
+            {
                 Composers[CompNameEdit]
                     .GetTextInput(IDTitleInput)
                         .SetValue(Title);
             }
-            if (CurrentPageNumbering.Length > 0){
+            if (CurrentPageNumbering.Length > 0)
+            {
                 Composers[CompNameEdit]
                     .GetDynamicText(IDPageArea)
-                        .SetNewText(CurrentPageNumbering,false,true,false);
+                        .SetNewText(CurrentPageNumbering, false, true, false);
             }
             UpdatingCurrentPageNumbering();
         }
 
         private bool OnButtonNextPage()
         {
-            if (PageCurrent < PageMax)
+            if (PageCurrent < (PageMax - 1))
             {
                 SavingInputTemporary();
                 PageCurrent += 1;
@@ -319,28 +341,27 @@ namespace books.src
                 PageCurrent -= 1;
                 UpdatingText();
                 UpdatingCurrentPageNumbering();
-                
+
             }
             return true;
         }
 
-        private bool OnButtonSub(){
+        private bool OnButtonSub()
+        {
 
-            if (PageMax > 0)
+            if (PageMax > 1)
             {
                 Text[PageMax] = "";
                 PageMax -= 1;
-                // Need to return to prev. page if currently displayed lastpage was deleted
-                if (PageCurrent > PageMax)
-                {
-                    UpdatingText();
-                    OnButtonPrevPage();
-                    return true;
-                }
-
-                UpdatingCurrentPageNumbering();
-                
             }
+            // Need to return to prev. page if currently displayed lastpage was deleted
+            if (PageCurrent >= PageMax)
+            {
+                UpdatingText();
+                OnButtonPrevPage();
+            }
+            UpdatingCurrentPageNumbering();
+
             return true;
         }
 
@@ -350,7 +371,7 @@ namespace books.src
             if (PageMax < (PageLimit - 1))
             {
                 PageMax += 1;
-                Text[PageMax] = "";
+                Text[PageMax-1] = "";
                 UpdatingCurrentPageNumbering();
 
             }
@@ -366,7 +387,7 @@ namespace books.src
                 Composers[CompNameEdit]
                     .FocusElement(Composers[CompNameEdit]
                     .GetTextArea(IDTextArea)
-                    .TabIndex);      
+                    .TabIndex);
             }
             else {
                 Composers[CompNameRead]
@@ -376,7 +397,8 @@ namespace books.src
             }
         }
 
-        private void OnTitleAreaChanged (string value){
+        private void OnTitleAreaChanged(string value)
+        {
             if (DialogTitle == DialogNameEditor)
             {
                 GuiElementTextInput TitleArea = Composers[CompNameEdit].GetTextInput(IDTitleInput);
@@ -401,23 +423,26 @@ namespace books.src
             OnButtonCancel();
         }
 
-        // OnButtonSave commits text to block
         private bool OnButtonSave()
         {
+            // OnButtonSave commits text to block
+            // making it unique
             if (DialogTitle == DialogNameEditor)
             {
                 SavingInputTemporary();
+                Unique = true;
 
                 byte[] data;
                 using (MemoryStream ms = new MemoryStream())
                 {
                     BinaryWriter writer = new BinaryWriter(ms);
                     writer.Write(PageMax);
-                    for (int i = 0; i <= PageMax; i++)
+                    for (int i = 0; i < PageMax; i++)
                     {
                         writer.Write(Text[i]);
                     }
                     writer.Write(Title);
+                    writer.Write(Unique);
                     data = ms.ToArray();
                 }
                 capi
@@ -425,8 +450,8 @@ namespace books.src
                     .SendBlockEntityPacket(BEPos.X, BEPos.Y, BEPos.Z, (int)EnumBookPacketId.SaveBook, data);
 
                 didSave = true;
-                unique = true;
                 TryClose();
+                Dispose(); 
             }
             return true;
         }
@@ -520,7 +545,6 @@ namespace books.src
                 .Compose();
 
             UpdatingCurrentPageNumbering();
-
         }
     }
 }

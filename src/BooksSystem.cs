@@ -23,12 +23,9 @@ namespace books.src
         public ICoreClientAPI Capi { get; private set; }
         public IClientNetworkChannel CChannel { get; private set; }
 
-
         // Server:
         public ICoreServerAPI Sapi { get; private set; }
         public IServerNetworkChannel SChannel { get; private set; }
-
-
 
         public override bool ShouldLoad(EnumAppSide side)
         {

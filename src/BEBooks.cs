@@ -14,7 +14,8 @@ using Vintagestory.API.MathTools;
 using Vintagestory.GameContent;
 
 // TODO : Privileges?
-
+// TODO : Networkhandler?
+// TODO : save authorID?
 
 namespace books.src
 {
@@ -25,25 +26,29 @@ namespace books.src
         public ICoreServerAPI Sapi;
 
         public int
+            // current page/pagemax <= pagelimit
             PageMax = 1;
         private static int
             PageLimit = 20;
         private static string
             IDDialogBookEditor = "bookeditor",
-            IDDialogBookReader = "bookeader",
+            IDDialogBookReader = "bookreader",
+            // control falgs for read write gui
             flag_R = "R",
             flag_W = "W",
             NetworkName = "BlockEntityTextInput";
         public string[]
             arText = new string[PageLimit],
             arPageNames = new string[PageLimit];
-        public string Title = "";
+        public string
+            Title = "",
+            Author = "";
 
-        public bool unique = false;
+        public bool Unique;
 
-        ItemStack tempStack;
+        public ItemStack tempStack;
 
-        BlockBooks ownBook;
+        private BooksAnimationHandler BookAnim;
 
         public BlockEntityBooks() : base() { }
 
@@ -98,34 +103,44 @@ namespace books.src
             this.arText[0] = "Your text";
         }
 
+
+        public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tessThreadTesselator)
+        {
+            return BookAnim.HideDrawModel();
+        }
+
         public override void Initialize(ICoreAPI api)
         {
             base.Initialize(api);
-            this.ownBook = Block as BlockBooks;
             this.Api = api;
-            NamingPages();
+
+            if (api is ICoreClientAPI)
+                BookAnim = new BooksAnimationHandler(api as ICoreClientAPI, this);
+
         }
 
-        public override void FromTreeAtributes(ITreeAttribute tree, IWorldAccessor worldForResolving)
+        public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldAccessForResolve)
         {
-            base.FromTreeAtributes(tree, worldForResolving);
+            base.FromTreeAttributes(tree, worldAccessForResolve);
+
             // TODO: rewrite to only send data on read
             // only always load title info!
-
-            PageMax = tree.GetInt("PageMax",1);
-            Title = tree.GetString("title", "Your title");
+            Unique = tree.GetBool("unique", false);
+            PageMax = tree.GetInt("PageMax", 1);
+            Title = tree.GetString("title", "");
             if (arPageNames[0] == null)
                 NamingPages();
             for (int i = 0; i < PageMax; i++)
             {
                 arText[i] = tree.GetString(arPageNames[i], "");
             }
-
         }
 
         public override void ToTreeAttributes(ITreeAttribute tree)
         {
             base.ToTreeAttributes(tree);
+
+            tree.SetBool("unique", Unique);
             tree.SetInt("PageMax", PageMax);
             tree.SetString("title", Title);
             if (arPageNames[0] == null)
@@ -138,22 +153,30 @@ namespace books.src
             }
         }
 
-
+        public override void OnBlockBroken()
+        {
+            // unregister renderer?
+            if(Api.World is ICoreClientAPI)
+                BookAnim.Dispose();
+            // keep data
+            // base.OnBlockBroken(); 
+        }
+        
 
         public void OnRightClick(IPlayer byPlayer)
         {
             string controlRW = flag_R;
 
-            // TODO: Add animation, see> ClientAnimator, maybe better animatorbase!
-            // https://apidocs.vintagestory.at/api/Vintagestory.API.Common.AnimationManager.html#Vintagestory_API_Common_AnimationManager_StartAnimation_System_String_
-            //
-            // https://apidocs.vintagestory.at/api/Vintagestory.API.Client.GuiElementCustomDraw.html#Vintagestory_API_Client_GuiElementCustomDraw_OnMouseDownOnElement_Vintagestory_API_Client_ICoreClientAPI_Vintagestory_API_Client_MouseEvent_
-            //
-            
+            ItemSlot hotbarSlot = byPlayer.InventoryManager.ActiveHotbarSlot;
+
+            if (byPlayer?.Entity?.Controls?.Sprint == true)
+            {
+                if (Api is ICoreClientAPI)
+                    BookAnim.Close(Api);
+            }
 
             if (byPlayer?.Entity?.Controls?.Sneak == true)
             {
-                ItemSlot hotbarSlot = byPlayer.InventoryManager.ActiveHotbarSlot;
                 if ((hotbarSlot?.Itemstack?.ItemAttributes?["quillink"].Exists == true)
                         || (hotbarSlot?.Itemstack?.ItemAttributes?["pen"].Exists == true))
                 {
@@ -162,10 +185,11 @@ namespace books.src
                     controlRW = flag_W;
                 }
             }
+            if (arText[0] == null)
+                DeletingText();
 
             if (Api.World is IServerWorldAccessor)
             {
-
                 byte[] data;
                 using (MemoryStream ms = new MemoryStream())
                 {
@@ -178,37 +202,37 @@ namespace books.src
                     }
                     writer.Write(Title);
                     writer.Write(controlRW);
+                    writer.Write(Unique);
+
                     data = ms.ToArray();
                 }
 
-                        ((ICoreServerAPI)Api).Network.SendBlockEntityPacket(
-                            (IServerPlayer)byPlayer,
-                            Pos.X, Pos.Y, Pos.Z,
-                            (int)EnumBookPacketId.OpenDialog,
-                            data
-                        );
+                ((ICoreServerAPI)Api).Network.SendBlockEntityPacket(
+                    (IServerPlayer)byPlayer,
+                    Pos.X, Pos.Y, Pos.Z,
+                    (int)EnumBookPacketId.OpenDialog,
+                    data
+                );
             }
-
         }
 
         public override void OnReceivedClientPacket(IPlayer player, int packetid, byte[] data)
         {
-            // TODO: populate BooksNetworkHandler, sloppy:
+            // TODO: populate BooksNetworkHandler:
             if (packetid == (int)EnumBookPacketId.SaveBook)
             {
                 using (MemoryStream ms = new MemoryStream(data))
                 {
                     BinaryReader reader = new BinaryReader(ms);
                     PageMax = reader.ReadInt32();
-                    for (int i = 0; i <= PageMax; i++)
+                    for (int i = 0; i < PageMax; i++)
                     {
                         arText[i] = reader.ReadString();
                     }
                     Title = reader.ReadString();
+                    Unique = reader.ReadBoolean();
                 }
                 NamingPages();
-                
-                unique = true;
                 MarkDirty(true);
                 Api.World.BlockAccessor.GetChunkAtBlockPos(Pos.X, Pos.Y, Pos.Z).MarkModified();
             }
@@ -216,8 +240,9 @@ namespace books.src
             if (packetid == (int)EnumBookPacketId.CancelEdit && tempStack != null)
             {
                 player.InventoryManager.TryGiveItemstack(tempStack);
-                tempStack = null;
             }
+            tempStack = null;
+
         }
 
         public override void OnReceivedServerPacket(int packetid, byte[] data)
@@ -237,15 +262,18 @@ namespace books.src
                     }
                     Title = reader.ReadString();
                     string controlRW = reader.ReadString();
-                     
+                    bool unique = reader.ReadBoolean();
+
                     IClientWorldAccessor clientWorld = (IClientWorldAccessor)Api.World;
+
 
                     if (controlRW.Equals(flag_W))
                     {
-                        BooksGui BGuiWrite = new BooksGui(Title, arText, PageMax, Api as ICoreClientAPI, IDDialogBookEditor);
+                        BooksGui BGuiWrite = new BooksGui(unique, Title, arText, PageMax, Api as ICoreClientAPI, IDDialogBookEditor);
                         BGuiWrite.WriteGui(Pos, Api as ICoreClientAPI);
                         BGuiWrite.OnCloseCancel = () =>
                         {
+                            BookAnim.Close();
                             (Api as ICoreClientAPI)
                             .Network
                             .SendBlockEntityPacket(
@@ -253,13 +281,14 @@ namespace books.src
                                 (int)EnumBookPacketId.CancelEdit,
                                 null);
                         };
-                        BGuiWrite.TryOpen();
+                        BGuiWrite?.TryOpen();
                     }
                     else {
-                        BooksGui BGuiRead = new BooksGui(Title, arText, PageMax, Api as ICoreClientAPI, IDDialogBookReader);
+                        BooksGui BGuiRead = new BooksGui(unique, Title, arText, PageMax, Api as ICoreClientAPI, IDDialogBookReader);
                         BGuiRead.ReadGui(Pos, Api as ICoreClientAPI);
                         BGuiRead.OnCloseCancel = () =>
                         {
+                            BookAnim.Close();
                             (Api as ICoreClientAPI)
                             .Network
                             .SendBlockEntityPacket(
@@ -267,7 +296,11 @@ namespace books.src
                                 (int)EnumBookPacketId.CancelEdit,
                                 null);
                         };
-                        BGuiRead.TryOpen();
+                        BGuiRead?.TryOpen();
+                    }
+                    if (Api is ICoreClientAPI)
+                    {
+                        BookAnim.Open(Api);
                     }
                 }
             }

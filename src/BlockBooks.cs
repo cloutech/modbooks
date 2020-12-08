@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Vintagestory.API;
 using Vintagestory.API.Client;
 using Vintagestory.API.Server;
 using Vintagestory.API.Common;
@@ -21,12 +17,31 @@ namespace books.src
     class BlockBooks : Block
     {
         public ICoreAPI Api;
-    
+
         public WorldInteraction[] interactbook;
 
         public static string
+            IDInteract = "BooksBlockInteract",
+            defTitle = "books: books - north",
+            // required Items:
+            reqItem1 = "quillink",
+            reqItem2 = "pen",
+            // TreeAttribute names:
             saveTitle = "booktitle",
-            savePageMax = "PageMax";
+            savePageMax = "PageMax",
+            saveIsUnique = "isunique",
+            saveAuthor = "author",
+            defaultAuthor = "Unknown",
+            // Keyboard hotkey:
+            _HotKeyWrite = "sneak",
+            _HotKeyClose = "sprint",
+            // Action Language Code mouseover:
+            ALCHelpClose = "books:books-mouse-over-help-close",
+            ALCHelpWrite = "books:books-mouse-over-help-write",
+            ALCHelpRead = "books:books-mouse-over-help-read",
+            // On mouse hover itemstack:
+            descr = "Title: ",
+            author = "Author: ";
 
         public override void OnLoaded(ICoreAPI api)
         {
@@ -35,25 +50,32 @@ namespace books.src
 
             if (api.Side != EnumAppSide.Client) return;
 
-
-            interactbook = ObjectCacheUtil.GetOrCreate(api, "BooksBlockInteract", () =>
+            interactbook = ObjectCacheUtil.GetOrCreate(api, IDInteract, () =>
             {
                 List<ItemStack> stacksList = new List<ItemStack>();
-
                 foreach (CollectibleObject collectible in api.World.Collectibles)
                 {
-                    if ((collectible.Attributes?["quillink"].Exists == true)
-                            ||(collectible.Attributes?["pen"].Exists == true))
+                    if ((collectible.Attributes?[reqItem1].Exists == true)
+                            || (collectible.Attributes?[reqItem2].Exists == true))
                     {
                         stacksList.Add(new ItemStack(collectible));
                     }
                 }
-
-                return new WorldInteraction[] { new WorldInteraction()
+                return new WorldInteraction[] {
+                     new WorldInteraction()
                     {
-                        // in: game\lang\en.jfson ="Write text",
-                        ActionLangCode = "blockhelp-sign-write", 
-                        HotKeyCode = "sneak",
+                        ActionLangCode = ALCHelpRead,
+                        MouseButton = EnumMouseButton.Right
+                    },
+                   new WorldInteraction() {
+                        ActionLangCode = ALCHelpClose,
+                        HotKeyCode = _HotKeyClose,
+                        MouseButton = EnumMouseButton.Right
+                    },
+                    new WorldInteraction()
+                    {
+                        ActionLangCode = ALCHelpWrite,
+                        HotKeyCode = _HotKeyWrite,
                         MouseButton = EnumMouseButton.Right,
                         Itemstacks = stacksList.ToArray()
                     }
@@ -64,80 +86,123 @@ namespace books.src
         public override bool OnBlockInteractStart(IWorldAccessor world, IPlayer byPlayer, BlockSelection blockSel)
         {
             BlockEntity Entity = world.BlockAccessor.GetBlockEntity(blockSel.Position);
-            //TODO: empty book
+
             if (Entity is BlockEntityBooks)
             {
                 BlockEntityBooks BEBooks = (BlockEntityBooks)Entity;
                 BEBooks.OnRightClick(byPlayer);
                 return true;
-             }
-             return false;
+            }
+            return true;
         }
 
         public override WorldInteraction[] GetPlacedBlockInteractionHelp(IWorldAccessor world, BlockSelection selection, IPlayer forPlayer)
         {
             return interactbook.Append(base.GetPlacedBlockInteractionHelp(world, selection, forPlayer));
         }
-        /*
-        public override void OnBlockPlaced(IWorldAccessor world, BlockPos blockPos, ItemStack byItemStack = null)
-        {
-            base.OnBlockPlaced(world, blockPos, byItemStack);
-            BEBooks.Pos = blockPos;
-        }*/
 
-        public override void OnBlockBroken(IWorldAccessor world, BlockPos pos, IPlayer byPlayer, float dropQuantityMultiplier = 1)
-        {
-            
-            // destroying block:
-            base.OnBlockBroken(world,pos,byPlayer,1);
+
+        public override void OnBlockBroken(IWorldAccessor world, BlockPos blockPos, IPlayer byPlayer, float dropQuantityMultiplier = 0)
+        {   
+                  
+            BlockEntity beb = world.BlockAccessor.GetBlockEntity(blockPos) as BlockEntityBooks;
+
+            if (beb is BlockEntityBooks)
+            {
+                BlockEntityBooks BEBooks = (BlockEntityBooks)beb;
+
+                if (BEBooks.Unique)
+                {
+                    ItemStack UniqueBook = new ItemStack(api.World.BlockAccessor.GetBlock(blockPos));
+                    TreeAttribute BookTree = new TreeAttribute();
+                    BookTree.SetString(saveTitle, BEBooks.Title);
+                    // TODO: Author?
+                    BookTree.SetString(saveAuthor, defaultAuthor);
+                    BookTree.SetInt(savePageMax, BEBooks.PageMax);
+                    BookTree.SetBool(saveIsUnique, BEBooks.Unique);
+                    for (int i = 0; i < BEBooks.PageMax; i++)
+                    {
+                        BookTree.SetString(BEBooks.arPageNames[i], BEBooks.arText[i]);
+                    }
+                    UniqueBook.Attributes = BookTree;
+                    UniqueBook.ResolveBlockOrItem(world);
+                    api.World.SpawnItemEntity(UniqueBook, blockPos.ToVec3d());
+                    api.World.BlockAccessor.RemoveBlockEntity(blockPos);
+                    api.World.BlockAccessor.SetBlock(0, blockPos);
+                }
+                else
+                    base.OnBlockBroken(world, blockPos, byPlayer);
+            }  
         }
 
         public override void OnBlockPlaced(IWorldAccessor world, BlockPos blockPos, ItemStack byItemStack)
         {
-            base.OnBlockPlaced(world, blockPos, byItemStack);
+            api.World.BlockAccessor.SetBlock(byItemStack.Block.Id, blockPos);
+            api.World.BlockAccessor.SpawnBlockEntity("BlockEntityBooks", blockPos, byItemStack);
 
-            BlockEntity Entity = world.BlockAccessor.GetBlockEntity(blockPos);
-
-            if (Entity is BlockEntityBooks)
+            BlockEntity beb = world.BlockAccessor.GetBlockEntity(blockPos) as BlockEntityBooks;
+            
+            if (beb is BlockEntityBooks)
             {
-                
-                BlockEntityBooks BEBooks = (BlockEntityBooks)Entity;
-                ItemStack UniqueBook = byItemStack;
-                if ((UniqueBook != null) && (UniqueBook.Attributes.HasAttribute(saveTitle)))
-                {
+                BlockEntityBooks BEBooks = (BlockEntityBooks)beb;
 
-                    // save data to block 
-                    //BEBooks.Title = byItemStack.ItemAttributes.GetString("booktitle");
-                    BEBooks.PageMax = UniqueBook.Attributes.GetInt(savePageMax);
-                    BEBooks.Title = UniqueBook.Attributes.GetString(saveTitle);
-                    BEBooks.NamingPages();
-                    BEBooks.DeletingText();
-                    for (int i = 0; i < BEBooks.PageMax; i++)
+                if (BEBooks == null)
+                    BEBooks = new BlockEntityBooks(blockPos);
+
+                BEBooks.PageMax = byItemStack.Attributes.GetInt(savePageMax, 1);
+                BEBooks.Title = byItemStack.Attributes.GetString(saveTitle, "");
+                BEBooks.Author = byItemStack.Attributes.GetString(saveAuthor, "Unknown");
+                BEBooks.Unique = byItemStack.Attributes.GetBool(saveIsUnique, false);
+                BEBooks.NamingPages();
+                BEBooks.DeletingText();
+                for (int i = 0; i < BEBooks.PageMax; i++)
+                {
+                    BEBooks.arText[i] = byItemStack.Attributes.GetString(BEBooks.arPageNames[i]);
+                }
+                world.BlockAccessor.MarkBlockDirty(blockPos);
+                world.BlockAccessor.MarkBlockEntityDirty(blockPos);
+            }
+        }
+
+
+        public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
+        {
+            // TODO: displaying author? 
+            // Structure of dsc = 
+            // { Material: Wood
+            // Id: 4822
+            // Code: books: books - north
+            // Burn temperature: 600°C
+            // Burn duration: 12s
+            // }
+            base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
+
+            if (inSlot.Itemstack.Attributes.GetBool(saveIsUnique))
+            {
+                if (inSlot.Itemstack.Attributes.HasAttribute(saveTitle))
+                {
+                    int len;
+                    string
+                        temp = "",
+                        title = inSlot.Itemstack.Attributes.GetString(saveTitle);
+                    dsc.Replace("Wood", "Paper");
+                    temp = string.Concat(descr, title,"\n");
+                    dsc.Insert(0, temp);
+                    len = temp.Length;
+                    if (inSlot.Itemstack.Attributes.HasAttribute(saveAuthor))
                     {
-                        BEBooks.arText[i] = UniqueBook.Attributes.GetString(BEBooks.arPageNames[i]);
+                        temp = string.Concat(author, inSlot.Itemstack.Attributes.GetString(saveAuthor), "\n", "\n");
+                        dsc.Insert(len, temp);
                     }
                 }
             }
         }
-        public override void GetHeldItemInfo(ItemSlot inSlot, StringBuilder dsc, IWorldAccessor world, bool withDebugInfo)
-        {
-            base.GetHeldItemInfo(inSlot, dsc, world, withDebugInfo);
-            // showing info on hovering over itemstack in inventory
-            
 
-        }
-
-        public override RichTextComponentBase[] GetHandbookInfo(ItemSlot inSlot, ICoreClientAPI capi, ItemStack[] allStacks, ActionConsumable<string> openDetailPageFor)
-        {
-            return base.GetHandbookInfo(inSlot, capi, allStacks, openDetailPageFor);
-            // Link to handbook on h?
-        }
 
         public override string GetPlacedBlockName(IWorldAccessor world, BlockPos pos)
         {
-            // renaming unique books, so title is shown
+            // renaming unique books, so title is shown for easier handling
             BlockEntity beb = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityBooks;
-
             if (beb is BlockEntityBooks)
             {
                 BlockEntityBooks BEBooks = (BlockEntityBooks)beb;
@@ -148,38 +213,13 @@ namespace books.src
             }
             return base.GetPlacedBlockName(world, pos);
         }
-
-        public override ItemStack OnPickBlock(IWorldAccessor world, BlockPos pos)
-        {
-            BlockEntity beb = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityBooks;
-
-            if (beb is BlockEntityBooks)
-            {
-                BlockEntityBooks BEBooks = (BlockEntityBooks) beb;
-                ItemStack UniqueBook = new ItemStack(BEBooks.Block,1);
-                // to later recall book text, title and pages, save now:
-                UniqueBook.Attributes.SetString(saveTitle, BEBooks.Title);
-                UniqueBook.Attributes.SetInt(savePageMax, BEBooks.PageMax);
-                for (int i = 0; i < BEBooks.PageMax; i++)
-                {
-                    UniqueBook.Attributes.SetString(BEBooks.arPageNames[i], BEBooks.arText[i]);
-                }
-                // place in inventory
-                return UniqueBook;
-            }
-            else
-            {
-                return null;
-            }
-        }     
     }
 
     public class BlockInkpot : Block
     {
 
     }
-    //public class BlockBooksQuills : Block
-    //{ }
+
     public class ItemQuill : Item
     {
 
