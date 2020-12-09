@@ -1,0 +1,22 @@
+{
+	"__comment": "working",
+  "ingredientPattern": "H	I",
+  "width": 1,
+  "height": 2,
+  "ingredients": {
+    "H": {
+      "type": "item",
+      "code":  "game:hammer-*",
+	  isTool: true 
+    },
+    "I": { 
+	"type": "item",
+	"code": "game:ironbloom"
+	}
+  },
+  "output": {
+    "type": "item",
+    "code": "books:ironpowder",
+	quantity: 50
+  }
+}

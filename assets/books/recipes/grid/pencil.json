@@ -1,0 +1,36 @@
+[
+	{
+	  "ingredientPattern": "_H_,_I_,CWK",
+	  "width": 3,
+	  "height": 3,
+	  "ingredients": {
+		"C": { type: "item", code: "game:clay-*", quantity:2},
+		"K": { type: "item", code: "game:charcoal*", quantity:2},
+		"W": { type: "item", code: "game:plank-*" },
+		"I": { type: "item", code: "game:chisel-*", isTool: true},
+		"H": { type: "item", code: "game:hammer-*", isTool: true}
+	  },
+	  "output": {
+		"type": "item",
+		"code": "books:itempencil",
+		quantity: 4
+	  }
+	},
+	{
+	  "ingredientPattern": "_H_,_I_,CWK",
+	  "width": 3,
+	  "height": 3,
+	  "ingredients": {
+		"C": { type: "item", code: "game:clay-*"},
+		"K": { type: "item", code: "game:coke"},
+		"W": { type: "item", code: "game:plank-*"},
+		"I": { type: "item", code: "game:chisel-*", isTool: true},
+		"H": { type: "item", code: "game:hammer-*", isTool: true}
+	  },
+	  "output": {
+		"type": "item",
+		"code": "books:itempencil",
+		quantity: 8
+	  }
+	}
+]

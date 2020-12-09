@@ -1,0 +1,10 @@
+{
+	ingredientPattern: "Q	I",
+	ingredients: {
+		"Q": { type: "item", code: "books:itemquill" },
+		"I": { type: "block", code: "books:inkwell"}
+	},
+	width: 1,
+	height: 2,
+	output: { type: "item", code: "books:itemquillink", quantity: 1  }
+}	

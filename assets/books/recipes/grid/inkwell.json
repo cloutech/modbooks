@@ -1,0 +1,15 @@
+{
+  "ingredientPattern": "G_G,GGG",
+  "width": 3,
+  "height": 2,
+  "ingredients": {
+    "G": { 
+	"type": "block",
+	"code": "game:glass-plain"
+	}
+  },
+  "output": {
+    "type": "block",
+    "code": "books:inkwell"
+  }
+}

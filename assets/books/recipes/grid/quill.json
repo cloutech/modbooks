@@ -1,0 +1,15 @@
+{
+  "ingredientPattern": "FK",
+  "width": 2,
+  "height": 1,
+  "ingredients": {
+    "F": {
+      "type": "item", "code": "game:feather"},
+	"K": {
+      "type": "item","code": "game:knife-*", isTool: true }
+  },
+  "output": {
+    "type": "item",
+    "code": "books:itemquill"
+  }
+}
