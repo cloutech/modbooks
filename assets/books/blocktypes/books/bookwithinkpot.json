@@ -1,29 +1,30 @@
 {
-	code: "bookshinkpot",
+	code: "bookswithinkpot",
 	class: "BlockBooks",
-	entitycass: "BlockEntityBooks", 
+	entityClass: "BlockEntityBooks",
 	blockmaterial: "wood",
 	drawtype:"json",
-	maxstacksize: 64,
+	maxstacksize: 1,
 	resistance: 1.5,
 	lightabsorption: 0,
-	ambientocclusion: true,
-	renderpass: "opaque",
 	faceCullMode: "nevercull",
 	sideAo: { all: false },
-	sideopaque: {
-		all: false
-	},
+	ambientocclusion: true,
+	renderpass: "opaque",
+	sideopaque: "all",
 	materialDensity: 600,
-	behaviors: [ {name: "HorizontalOrientable"},{ "name": "Unstable" }],
+	behaviors: [ {name: "HorizontalOrientable"}],
 	entityBehaviors: [{ name: "Animatable" } ],
+	heldTpIdleAnimation: "holdunderarm",
 	variantgroups: [
 		{ code: "side", loadFromProperties: "abstract/horizontalorientation" }
 	],
 	"variantgroups": [ 
 	{ "loadFromProperties": "abstract/horizontalorientation" } 
 	],
-
+	attributes: [{
+			alwayswriteable:"true"
+	}],
 	textures: {
       "pages": { base: "block/books/pages" },
 	  "books": { base: "block/books/books" },

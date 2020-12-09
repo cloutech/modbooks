@@ -20,7 +20,7 @@
 	{ "loadFromProperties": "abstract/horizontalorientation" } 
 	],
 	textures: {
-      "pages": { base: "block/books/papers" },
+      "pages": { base: "block/books/pages" },
     },
 	shapebytype: {
 		"*-north": { base: "block/books/papers", rotateY: 0 },
@@ -55,16 +55,16 @@
 	},
 	
 	selectionboxbytype: {
-		"*-east": { x1: 0.32, y1: 0, z1: 0.21, x2: 0.71, y2: 0.13, z2: 0.79, rotateY: 270 },
-		"*-south": { x1: 0.32, y1: 0, z1: 0.21, x2: 0.71, y2: 0.13, z2: 0.79, rotateY: 180 },
-		"*-west": { x1: 0.32, y1: 0, z1: 0.21, x2: 0.71, y2: 0.13, z2: 0.79, rotateY: 90 },
-		"*-north": { x1: 0.32, y1: 0, z1: 0.21, x2: 0.71, y2: 0.13, z2: 0.79, rotateY: 0 },
+		"*-east": {x1: 0.23, y1: 0, z1: 0.17, x2: 0.77, y2: 0.1, z2: 0.82,  rotateY: 270 },
+		"*-south": { x1: 0.23, y1: 0, z1: 0.17, x2: 0.77, y2: 0.1, z2: 0.82,  rotateY: 180 },
+		"*-west": { x1: 0.23, y1: 0, z1: 0.17, x2: 0.77, y2: 0.1, z2: 0.82,  rotateY: 90 },
+		"*-north": {  x1: 0.23, y1: 0, z1: 0.17, x2: 0.77, y2: 0.1, z2: 0.82,  rotateY: 0 },
 	},
 	collisionboxbytype: {
-		"*-east": { x1: 0.32, y1: 0, z1: 0.21, x2: 0.71, y2: 0.13, z2: 0.79, rotateY: 270 },
-		"*-south": { x1: 0.32, y1: 0, z1: 0.21, x2: 0.71, y2: 0.13, z2: 0.79, rotateY: 180 },
-		"*-west": { x1: 0.32, y1: 0, z1: 0.21, x2: 0.71, y2: 0.13, z2: 0.79, rotateY: 90 },
-		"*-north": { x1: 0.32, y1: 0, z1: 0.21, x2: 0.71, y2: 0.13, z2: 0.79, rotateY: 0 },
+		"*-east": { x1: 0.23, y1: 0, z1: 0.17, x2: 0.77, y2: 0.1, z2: 0.82,  rotateY: 270 },
+		"*-south": { x1: 0.23, y1: 0, z1: 0.17, x2: 0.77, y2: 0.1, z2: 0.82,  rotateY: 180 },
+		"*-west": {x1: 0.23, y1: 0, z1: 0.17, x2: 0.77, y2: 0.1, z2: 0.82,  rotateY: 90 },
+		"*-north": {  x1: 0.23, y1: 0, z1: 0.17, x2: 0.77, y2: 0.1, z2: 0.82, rotateY: 0 },
 	},
 	
 	

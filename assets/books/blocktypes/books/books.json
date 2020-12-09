@@ -5,7 +5,7 @@
 	blockmaterial: "wood",
 	drawtype:"json",
 	maxstacksize: 1,
-	resistance: 1.5,
+	resistance: 1,
 	lightabsorption: 0,
 	ambientocclusion: true,
 	renderpass: "opaque",
