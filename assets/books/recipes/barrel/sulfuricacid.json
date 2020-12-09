@@ -1,0 +1,11 @@
+[
+	{
+		code: "sulfuricacid",
+		sealHours: 1,
+		ingredients: [
+			{ type: "item", code: "game:sulfur", quantity: 1},
+			{ type: "item", code: "game:waterportion", quantity: 25 }
+		],
+		output: { type: "item", code: "books:sulfuricacidportion", stackSize: 25 }
+	}
+]

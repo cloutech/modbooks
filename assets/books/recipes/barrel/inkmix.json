@@ -1,0 +1,20 @@
+[
+	{
+		code: "inkmix",
+		sealHours: 2,
+		ingredients: [
+			{ type: "item", code: "books:ironsulfideportion", quantity: 25},
+			{ type: "item", code: "game:resin", quantity: 1  }
+		],
+		output: { type: "item", code: "books:blackinkportion", stackSize: 25 }
+	},
+	{
+		code: "inkmix",
+		sealHours: 2,
+		ingredients: [
+			{ type: "item", code: "books:ironsulfideportion", quantity: 10},
+			{ type: "item", code: "game:honeyportion", quantity: 1  }
+		],
+		output: { type: "item", code: "books:blackinkportion", stackSize: 25 }
+	}
+]

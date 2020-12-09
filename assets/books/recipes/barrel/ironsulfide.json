@@ -1,0 +1,11 @@
+[
+	{
+		code: "ironsulfide",
+		sealHours: 0,
+		ingredients: [
+			{ type: "item", code: "books:sulfuricacidportion", quantity: 1},
+			{ type: "item", code: "books:ironpowder", quantity: 1 }
+		],
+		output: { type: "item", code: "books:ironsulfideportion", stackSize: 1 }
+	}
+]

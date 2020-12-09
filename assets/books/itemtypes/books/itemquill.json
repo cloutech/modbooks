@@ -8,7 +8,4 @@
 		burnTemperature: 400,
 		burnDuration: 2,
 	},
-	attributes: {
-			quill:"true",
-	}
 }

@@ -1,0 +1,34 @@
+{
+	code: "sulfurironmix",
+	class: "ItemLiquidPortion",
+	matterState: "liquid",
+	attributes: {
+		waterTightContainerProps: {
+			containable: true,
+			itemsPerLitre: 1,
+			texture: { base: "block/liquid/sulfurironmix" },
+			allowSpill: true,
+			whenSpilled: { 
+				action: "DropContents",
+				stack: { type: "item", code: "sulfurironmix" } 
+			}
+		}
+	},
+	shape: { base: "item/liquid" },
+	texture: { base: "block/liquid/sulfurironmix" },
+	creativeinventory: { "general": ["*"], "items": ["*"] },
+	maxstacksize: 16,
+	materialDensity: 200,
+	guiTransform: {
+		rotation: { x: 123, y: -33, z: -13 },
+		origin: { x: 0.5, y: 0, z: 0.5 },
+		scale: 1.4
+	},
+	fpHandTransform: {
+		translation: { x: 0, y: 0, z: 0 },
+		rotation: { x: 25, y: 157, z: -5 }
+	},
+	tpHandTransform: {
+		translation: { x: -1.5, y: -1, z: -1.4 }
+	}
+}

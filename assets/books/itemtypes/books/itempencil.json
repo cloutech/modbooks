@@ -1,0 +1,14 @@
+{
+	code: "itempencil",
+	texture: { base: "item/books/itempen" },
+	creativeinventory: { "general": ["*"], "items": ["*"] },
+	maxstacksize: 128,
+	materialDensity: 20,
+	combustibleProps: {
+		burnTemperature: 200,
+		burnDuration: 1,
+	},
+	attributes: {
+			pen:"true",
+	}
+}
