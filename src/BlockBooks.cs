@@ -137,7 +137,7 @@ namespace books.src
 
         public override void OnBlockPlaced(IWorldAccessor world, BlockPos blockPos, ItemStack byItemStack)
         {
-            api.World.BlockAccessor.SetBlock(byItemStack.Block.Id, blockPos);
+            api.World.BlockAccessor.SetBlock(this.Id, blockPos);
             api.World.BlockAccessor.SpawnBlockEntity("BlockEntityBooks", blockPos, byItemStack);
 
             BlockEntity beb = world.BlockAccessor.GetBlockEntity(blockPos) as BlockEntityBooks;
