@@ -5,7 +5,7 @@
 	blockmaterial: "wood",
 	drawtype:"json",
 	maxstacksize: 1,
-	resistance: 1,
+	resistance: 1.5,
 	lightabsorption: 0,
 	ambientocclusion: true,
 	renderpass: "opaque",
@@ -14,16 +14,18 @@
 	materialDensity: 600,
 	behaviors: [ {name: "HorizontalOrientable"}],
 	entityBehavior: [{name:"Animatable"}],
-	heldTpIdleAnimation: "holdunderarm",
+	attributes: {
+		handbook: {
+			groupBy: ["books-*"],
+		}
+	},
 	variantgroups: [
+		{ code:"color", states:["leather","red","green","blue","black"]},
 		{ code: "side", loadFromProperties: "abstract/horizontalorientation" }
 	],
-	"variantgroups": [ 
-	{ "loadFromProperties": "abstract/horizontalorientation" } 
-	],
 	textures: {
-      "pages": { base: "block/books/pages" },
-	  "books": { base: "block/books/books" },
+      "pages": { base: "block/books/{color}/pages" },
+	  "material": { base: "block/books/{color}/material" },
     },
 	shapebytype: {
 		"*-north": { base: "block/books/books", rotateY: 0 },
@@ -32,10 +34,7 @@
 		"*-west": { base: "block/books/books", rotateY: 90 },
 	},
 	creativeinventory: { "general": ["*-north"], "decorative": ["*-north"] },
-	
-	shapeinventory: {
-		base: "block/books/inv_books"
-	},
+
 	sidesolid: {
 		all: "false"
 	},
@@ -68,33 +67,30 @@
 		"*-south": { x1: 0.32, y1: 0, z1: 0.21, x2: 0.71, y2: 0.13, z2: 0.79, rotateY: 180 },
 		"*-west": { x1: 0.32, y1: 0, z1: 0.21, x2: 0.71, y2: 0.13, z2: 0.79, rotateY: 90 },
 		"*-north": { x1: 0.32, y1: 0, z1: 0.21, x2: 0.71, y2: 0.13, z2: 0.79, rotateY: 0 },
-	},
-	
-	
-	
+	},	
 	guiTransform: {
-		translation: { x: 0, y: -1, z: 0 },
-		rotation: { x: 141, y: -36, z: 1 },
-		origin: { x: 0, y: 0, z: 0 },
+		translation: { x: 0, y: 5, z: 0 },
+		rotation: { x: -53, y: 38, z: 0},
+		origin: { x: 0.5, y: 0, z: 0.5 },
 		scale: 2.46
 	},
 	fpHandTransform: {
-		translation: { x: 0.4, y: 0.4, z: 1 },
-		rotation: { x: 93, y: 145, z: 0 },
-		origin: { x: 0, y: 0, z: 0 },
-		scale: 2.5
+		translation: { x: 0, y: 0.4, z: 0.4 },
+		rotation: { x: 90, y: -43, z: -124 },
+		origin: { x: 0.5, y: 0, z: 0.5 },
+		scale: 2.6
 	},
 	tpHandTransform: {
-		translation: { x: -0.2, y: 0, z: 0 },
-		rotation: { x: 35, y: -112, z: 116 },
-		origin: { x: 0, y: 0, z: 0 },
+		translation: { x: -0.6, y: -0.13, z: -0.46 },
+		rotation: { x: -102, y: -86, z: 0 },
+		origin: { x: 0.5, y: 0, z: 0.5 },
 		scale: 0.67
 	},
 	groundTransform: {
 		translation: { x: 0, y: 0, z: 0 },
-		rotation: { x: -180, y: -149, z: -180 },
-		origin: { x: 0, y: 0, z: 0 },
-		scale: 2.94
+		rotation: { x: 0, y: 0, z: 0 },
+		origin: { x: 0.5, y: 0, z: 0.5 },
+		scale: 4
 	},
 	attributes: {
 		onDisplayTransform: {

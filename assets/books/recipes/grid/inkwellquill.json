@@ -2,7 +2,7 @@
 	ingredientPattern: "Q	I",
 	ingredients: {
 		"Q": { type: "item", code: "books:itemquill" },
-		"I": { type: "block", code: "books:inkwell"}
+		"I": { type: "block", code: "books:inkwell-ink"}
 	},
 	width: 1,
 	height: 2,

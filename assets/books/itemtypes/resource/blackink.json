@@ -6,16 +6,16 @@
 		waterTightContainerProps: {
 			containable: true,
 			itemsPerLitre: 1,
-			texture: { base: "block/liquid/blackink" },
+			texture: { base: "books:block/liquid/blackink" },
 			allowSpill: true,
 			whenSpilled: { 
 				action: "DropContents",
-				stack: { type: "item", code: "blackink" } 
+				stack: { type: "item", code: "books:blackink" } 
 			}
 		}
 	},
 	shape: { base: "item/liquid" },
-	texture: { base: "block/liquid/blackink" },
+	texture: { base: "books:block/liquid/blackink" },
 	creativeinventory: { "general": ["*"], "items": ["*"] },
 	maxstacksize: 16,
 	materialDensity: 200,

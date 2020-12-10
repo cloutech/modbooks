@@ -11,12 +11,12 @@
 		"P": { 
 		"type": "block",
 		"code": "books:papers-*",
-		"quantity" : 20
+		"quantity" : 10
 		}
 	  },
 	  "output": {
 		"type": "block",
-		"code": "books:books-north",
+		"code": "books:books-leather-north",
 		quantity: 1
 	  }
 	}
@@ -27,8 +27,8 @@
 	  "height": 3,
 	  "ingredients": {
 		"L": { "type": "item", "code": "game:leather"},
-		"P": {"type": "block","code": "books:papers",	"quantity" : 20},
-		"C": {"type": "block", "code": "game:ore-cinnabar"}
+		"P": {"type": "block","code": "books:papers-*",	"quantity" : 10},
+		"C": {"type": "item", "code": "game:ore-cinnabar"}
 	  },
 	  "output": {
 		"type": "block",
@@ -42,8 +42,8 @@
 	  "height": 3,
 	  "ingredients": {
 		"L": { "type": "item", "code": "game:leather"},
-		"P": {"type": "block","code": "books:papers",	"quantity" : 20},
-		"C": {"type": "block", "code": "game:ore-lapislazuli"}
+		"P": {"type": "block","code": "books:papers-*",	"quantity" : 10},
+		"C": {"type": "item", "code": "game:ore-lapislazuli"}
 	  },
 	  "output": {
 		"type": "block",
@@ -51,19 +51,33 @@
 		quantity: 1
 	  }
 	},
-
 		{
 	  "ingredientPattern": "L_L,LPL,LCL",
 	  "width": 3,
 	  "height": 3,
 	  "ingredients": {
 		"L": { "type": "item", "code": "game:leather"},
-		"P": {"type": "block","code": "books:papers",	"quantity" : 20},
-		"C": {"type": "block", "code": "game:ore-olivine"}
+		"P": {"type": "block","code": "books:papers-*",	"quantity" : 10},
+		"C": {"type": "item", "code": "game:crushed-olivine"}
 	  },
 	  "output": {
 		"type": "block",
 		"code": "books:books-green-north",
+		quantity: 1
+	  }
+	},
+			{
+	  "ingredientPattern": "L_L,LPL,LCL",
+	  "width": 3,
+	  "height": 3,
+	  "ingredients": {
+		"L": { "type": "item", "code": "game:leather"},
+		"P": {"type": "block","code": "books:papers-*",	"quantity" : 10},
+		"C": {"type": "block", "code": "books:inkwell-ink"}
+	  },
+	  "output": {
+		"type": "block",
+		"code": "books:books-black-north",
 		quantity: 1
 	  }
 	}

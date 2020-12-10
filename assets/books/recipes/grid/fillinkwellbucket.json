@@ -1,0 +1,22 @@
+{
+	ingredientPattern: "WI",
+	ingredients: {
+		"W": { 
+			type: "block", 
+			code: "game:woodbucket"
+		},
+		"I": { 
+			type: "block", 
+			code: "books:inkwell-empty"
+		}
+	},
+	width: 2,
+	height: 1,
+	attributes: {
+		liquidContainerProps: {
+			requiresContent: { type: "item", code: "books:blackink" },
+			requiresQuantity: 1
+		}
+	},
+	output: { type: "block", code: "books:inkwell-ink", stackSize: 1 }
+}

@@ -1,21 +1,21 @@
 {
-	code: "sulfuricacid",
+	code: "ironsulfide",
 	class: "ItemLiquidPortion",
 	matterState: "liquid",
 	attributes: {
 		waterTightContainerProps: {
 			containable: true,
 			itemsPerLitre: 1,
-			texture: { base: "books:block/liquid/sulfuricacid" },
+			texture: { base: "books:block/liquid/ironsulfide" },
 			allowSpill: true,
 			whenSpilled: { 
 				action: "DropContents",
-				stack: { type: "item", code: "sulfuricacid" } 
+				stack: { type: "item", code: "ironsulfide" } 
 			}
 		}
 	},
 	shape: { base: "item/liquid" },
-	texture: { base: "books:block/liquid/sulfuricacid" },
+	texture: { base: "block/liquid/ironsulfide" },
 	creativeinventory: { "general": ["*"], "items": ["*"] },
 	maxstacksize: 16,
 	materialDensity: 200,

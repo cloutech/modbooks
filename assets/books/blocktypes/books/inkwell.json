@@ -1,7 +1,6 @@
-{
-	code: "inkwell",
+{ 
+	code: "Inkwell",
 	blockmaterial: "Glass",
-	maxstacksize: 128,
 	resistance: 0.25,
 	lightabsorption: 0,
 	ambientocclusion: true,
@@ -13,33 +12,63 @@
 	},
 	rainPermeable: false,
 	materialDensity:1200,
-	
-	attributes: {
-		displaycaseable: true, 
-		shelvable: true,
+	behaviors: [
+		{ name: "SneakPlacing"}, 
+		{ name: "UnstableFalling", properties: { attachmentArea: { x1: 5, y1: 0, z1: 5, x2: 10, y2: 0, z2: 10 } }}, 
+		{ name: "RightClickPickup"} 
+	],
+	variantgroups: [
+		{ code:"type", states: ["empty", "ink"] },
+	],
+	attributesByType: {
+		"*-empty": {
+			shelvable: true,
+			contentItem2BlockCodes: {
+				"blackink": "inkwell-ink"
+			},
+		},
+		"*-ink": {
+			shelvable: true,
+			contentItemCode: "blackink",
+			emptiedBlockCode: "inkwell-empty",
+		},
+		"*": {
+			shelvable: true,
+			bowlContents: null
+		}
 	},
 	
-	behaviors: [ { "name": "Unstable" } ],
-	creativeinventory: { 
-		"general": ["*"] 
+
+	shapeByType: {
+		"*-ink": { base: "block/books/inkwell" },
+		"*": { base: "block/books/inkwell" },
 	},
+	creativeinventory: { "general": ["*"], "decorative": ["*"] },
+	replaceable: 300,
+	resistance: 0.75,
+	maxStackSizeByType: {
+		"*-ink": 64,
+		"*": 64,
+	},
+	
 	textures: {
 
     },
-	shape: {
-		base: "block/books/inkwell"
-	},	
+
 	shapeinventory: {
 		base: "block/books/inv_inkwell"
 	},
-	sideAo: { all: false },
 	sideopaque: {
+		all: false
+	},
+	sidesolid: {
 		all: false
 	},
 	sounds: {
 		"place": "player/buildhigh",
 		"break": "block/glass",
-		"hit": "block/glass"
+		"hit": "block/glass",
+		walk: "walk/stone",
 	},
 	collisionbox: { x1: 0.42, y1: 0, z1: 0.42, x2: 0.58, y2: 0.12, z2: 0.58, rotateY: 0 },
 	selectionbox: { x1: 0.42, y1: 0, z1: 0.42, x2: 0.58, y2: 0.12, z2: 0.58, rotateY: 0 },
