@@ -101,7 +101,6 @@ namespace books.src
 
         public override void OnBlockBroken(IWorldAccessor world, BlockPos blockPos, IPlayer byPlayer, float dropQuantityMultiplier = 0)
         {
-
             BlockEntity beb = world.BlockAccessor.GetBlockEntity(blockPos) as BlockEntityBooks;
 
             if (beb is BlockEntityBooks)
@@ -113,7 +112,6 @@ namespace books.src
                     ItemStack UniqueBook = new ItemStack(api.World.BlockAccessor.GetBlock(blockPos));
                     TreeAttribute BookTree = new TreeAttribute();
                     BookTree.SetString(saveTitle, BEBooks.Title);
-                    // TODO: Author?
                     BookTree.SetString(saveAuthor, defaultAuthor);
                     BookTree.SetInt(savePageMax, BEBooks.PageMax);
                     BookTree.SetBool(saveIsUnique, BEBooks.Unique);
@@ -126,38 +124,37 @@ namespace books.src
                     api.World.SpawnItemEntity(UniqueBook, blockPos.ToVec3d());
                     api.World.BlockAccessor.RemoveBlockEntity(blockPos);
                     api.World.BlockAccessor.SetBlock(0, blockPos);
+                    return;
                 }
-                else
-                    base.OnBlockBroken(world, blockPos, byPlayer);
             }
+            base.OnBlockBroken(world, blockPos, byPlayer);
         }
+
 
         public override void OnBlockPlaced(IWorldAccessor world, BlockPos blockPos, ItemStack byItemStack)
         {
-            api.World.BlockAccessor.SetBlock(this.Id, blockPos);
-            api.World.BlockAccessor.SpawnBlockEntity("BlockEntityBooks", blockPos, byItemStack);
+            base.OnBlockPlaced(world, blockPos, byItemStack);
 
-            BlockEntity beb = world.BlockAccessor.GetBlockEntity(blockPos) as BlockEntityBooks;
-
-            if (beb is BlockEntityBooks)
+            if (world.Api is ICoreServerAPI)
             {
-                BlockEntityBooks BEBooks = (BlockEntityBooks)beb;
-
-                if (BEBooks == null)
-                    BEBooks = new BlockEntityBooks(blockPos, true);
-
-                BEBooks.PageMax = byItemStack.Attributes.GetInt(savePageMax, 1);
-                BEBooks.Title = byItemStack.Attributes.GetString(saveTitle, "");
-                BEBooks.Author = byItemStack.Attributes.GetString(saveAuthor, "Unknown");
-                BEBooks.Unique = byItemStack.Attributes.GetBool(saveIsUnique, false);
-                BEBooks.NamingPages();
-                BEBooks.DeletingText();
-                for (int i = 0; i < BEBooks.PageMax; i++)
+                BlockEntity be = world.BlockAccessor.GetBlockEntity(blockPos) as BlockEntityBooks;
+                if (be is BlockEntityBooks)
                 {
-                    BEBooks.arText[i] = byItemStack.Attributes.GetString(BEBooks.arPageNames[i]);
+                    BlockEntityBooks BEBooks;
+                    BEBooks = (BlockEntityBooks)be;
+                    BEBooks.PageMax = byItemStack.Attributes.GetInt(savePageMax, 1);
+                    BEBooks.Title = byItemStack.Attributes.GetString(saveTitle, "");
+                    BEBooks.Author = byItemStack.Attributes.GetString(saveAuthor, "Unknown");
+                    BEBooks.Unique = byItemStack.Attributes.GetBool(saveIsUnique, false);
+                    BEBooks.DeletingText();
+                    BEBooks.NamingPages();
+                    for (int i = 0; i < BEBooks.PageMax; i++)
+                    {
+                        BEBooks.arText[i] = byItemStack.Attributes.GetString(BEBooks.arPageNames[i], "");
+                    }
+                    world.BlockAccessor.MarkBlockDirty(blockPos);
+                    world.BlockAccessor.MarkBlockEntityDirty(blockPos);
                 }
-                world.BlockAccessor.MarkBlockDirty(blockPos);
-                world.BlockAccessor.MarkBlockEntityDirty(blockPos);
             }
         }
 

@@ -62,11 +62,14 @@ namespace books.src
             this.Pos = blockPos;
         }
         
-        public BlockEntityBooks(BlockPos blockPos, bool isPaper, string title, string[] text) : base()
+        public BlockEntityBooks(bool isUnique, bool isPaper, int pageMax, string title, string author, string[] text, BlockPos blockPos) : base()
         {
             this.isPaper = isPaper;
-            DeletingText();
+            this.Unique = isUnique;
             this.Pos = blockPos;
+            this.PageMax = pageMax;
+            this.Author = author;
+            DeletingText();
             this.arText = text;
             this.Title = title;
         }

@@ -12,7 +12,7 @@
 	sideopaque: "all",
 	rainPermeable: true,
 	materialDensity: 600,
-	behaviors: [ {name: "HorizontalOrientable"}],
+	behaviors: [ {name: "HorizontalOrientable"},{name:"Lockable"}, {name:"UnstableFalling"}],
 	entityBehavior: [{name:"Animatable"}],
 	attributes: {
 		handbook: {
@@ -81,9 +81,9 @@
 		scale: 2.6
 	},
 	tpHandTransform: {
-		translation: { x: -0.6, y: -0.13, z: -0.46 },
+		translation: { x: -0.5, y: 0.4, z: 0 },
 		rotation: { x: -102, y: -86, z: 0 },
-		origin: { x: 0.5, y: 0, z: 0.5 },
+		origin: { x: 0, y: 0, z: 0 },
 		scale: 0.67
 	},
 	groundTransform: {

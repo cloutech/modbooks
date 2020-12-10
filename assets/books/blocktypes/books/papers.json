@@ -12,7 +12,7 @@
 	sideopaque: "all",
 	rainPermeable: true,
 	materialDensity: 600,
-	behaviors: [ {name: "HorizontalOrientable"}],
+	behaviors: [ {name: "HorizontalOrientable"}, {name:"HorizontalAttachable"}],
 	variantgroups: [
 		{ code: "side", loadFromProperties: "abstract/horizontalorientation" }
 	],
