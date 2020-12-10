@@ -1,9 +1,9 @@
 {
   "type": "code",
   "modid": "books",
-  "name": "Writeable Books",
+  "name": "Books, Paper and Ink",
   "author": "Christoph Clouser",
-  "description": "Adds ink, paper, books and a quill!",
+  "description": "Adds ink, paper, books, pen, quill and more to write with!",
   "version": "1.0.0",
   "dependency": {
     "game": "1.14.0"
