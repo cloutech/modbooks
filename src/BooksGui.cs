@@ -15,8 +15,11 @@ namespace books.src
     {
         ICoreClientAPI Capi;
 
-        private int PageCurrent = 0;
-        public int PageMax { get; private set; }
+        private int 
+            PageCurrent = 0;
+
+        public int 
+            PageMax { get; private set; }
 
         private static int
             MaxTitleWidth = 240,
@@ -53,8 +56,8 @@ namespace books.src
 
         private static string
             // Language en.json references:
-            //LangText = "books:editor-text-default",
-            //LangTitel = "books:editor-titel-default",
+            LangTextDef = "books:editor-text-default",
+            LangTitelDef = "books:editor-titel-default",
             LangTitelEditor = "books:editor-titel",
             LangbCancel = "books:editor-cancel",
             LangbSave = "books:editor-save",
@@ -75,24 +78,37 @@ namespace books.src
             _bNextPage = ">>",
             _bPrevPage = "<<";
 
-        private string[] Text = new string[PageLimit];
+        private string[] Text = new string[20];
 
         BlockPos BEPos;
 
         public Action<string> OnTextChanged;
         public Action OnCloseCancel;
 
-        public bool didSave;
-        public bool Unique = false;
+        public bool 
+            didSave,
+            isPaper = false,
+            Unique = false;
 
         public BooksGui(bool unique, string booktitle, string[] text, int pagemax, ICoreClientAPI capi, string dialogTitel) : base(dialogTitel, capi)
         {
             Capi = capi;
-            PageMax = pagemax;
             GetLangEntries();
-            Title = booktitle;
+            PageMax = pagemax;
             DeletingText();
             text.CopyTo(Text, 0);
+            Title = booktitle;
+            Unique = unique;
+        }
+        public BooksGui(bool isPaper, bool unique, string booktitle, string[] text, int pagemax, ICoreClientAPI capi, string dialogTitel) : base(dialogTitel, capi)
+        {
+            Capi = capi;
+            GetLangEntries();
+            this.isPaper = isPaper;
+            PageMax = pagemax;
+            DeletingText();
+            text.CopyTo(Text, 0);
+            Title = booktitle;
             Unique = unique;
         }
 
@@ -119,11 +135,12 @@ namespace books.src
         private void DeletingText()
         {
             Unique = false;
-            Text[0] = "";
             for (int i = 0; i < PageLimit; i++)
             {
                 Text[i] = "";
             }
+            Text[0] = Lang.Get(LangTextDef);
+            Title = Lang.Get(LangTitelDef);
         }
 
         private void UpdatingText()
@@ -367,13 +384,17 @@ namespace books.src
 
         private bool OnButtonAdd()
         {
+            if(isPaper)
+            {
+                if (PageMax == 2)
+                    return true; 
+            }
 
-            if (PageMax < (PageLimit - 1))
+            if (PageMax < PageLimit)
             {
                 PageMax += 1;
                 Text[PageMax-1] = "";
                 UpdatingCurrentPageNumbering();
-
             }
 
             return true;

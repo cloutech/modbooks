@@ -37,10 +37,8 @@ namespace books.src
             base.Start(api);
             
             api.RegisterBlockClass("BlockBooks", typeof(BlockBooks));                        
-            api.RegisterBlockEntityClass("BlockEntityBooks", typeof(BlockEntityBooks)); 
-            api.RegisterBlockClass("inkpot", typeof(BlockInkpot));
-            api.RegisterItemClass("itemquill", typeof(ItemQuill));
-
+            api.RegisterBlockEntityClass("BlockEntityBooks", typeof(BlockEntityBooks));
+            api.RegisterBlockClass("BlockPaper", typeof(BlockPaper));
         }
 
         public override void StartClientSide(ICoreClientAPI capi)

@@ -31,6 +31,7 @@ namespace books.src
         private static int
             PageLimit = 20;
         private static string
+            // ID/dialog keys:
             IDDialogBookEditor = "bookeditor",
             IDDialogBookReader = "bookreader",
             // control falgs for read write gui
@@ -44,22 +45,26 @@ namespace books.src
             Title = "",
             Author = "";
 
-        public bool Unique;
+        public bool 
+            isPaper = false,
+            Unique;
 
         public ItemStack tempStack;
-
         private BooksAnimationHandler BookAnim;
 
         public BlockEntityBooks() : base() { }
 
-        public BlockEntityBooks(BlockPos blockPos) : base()
+
+        public BlockEntityBooks(BlockPos blockPos, bool isPaper) : base()
         {
+            this.isPaper = isPaper;
             DeletingText();
             this.Pos = blockPos;
         }
         
-        public BlockEntityBooks(BlockPos blockPos, string title, string[] text) : base()
+        public BlockEntityBooks(BlockPos blockPos, bool isPaper, string title, string[] text) : base()
         {
+            this.isPaper = isPaper;
             DeletingText();
             this.Pos = blockPos;
             this.arText = text;
@@ -100,13 +105,16 @@ namespace books.src
             {
                 this.arText[i] = "";
             }
-            this.arText[0] = "Your text";
+          
         }
 
 
         public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tessThreadTesselator)
         {
-            return BookAnim.HideDrawModel();
+            if ((Api is ICoreClientAPI) && (!isPaper))
+                return BookAnim.HideDrawModel();
+            else
+                return false;
         }
 
         public override void Initialize(ICoreAPI api)
@@ -114,9 +122,15 @@ namespace books.src
             base.Initialize(api);
             this.Api = api;
 
-            if (api is ICoreClientAPI)
+            if ((api is ICoreClientAPI)&& (!isPaper))
                 BookAnim = new BooksAnimationHandler(api as ICoreClientAPI, this);
 
+            if (arPageNames == null)
+            {
+                NamingPages();
+            }
+            if (!Unique)
+                DeletingText();
         }
 
         public override void FromTreeAttributes(ITreeAttribute tree, IWorldAccessor worldAccessForResolve)
@@ -129,7 +143,11 @@ namespace books.src
             PageMax = tree.GetInt("PageMax", 1);
             Title = tree.GetString("title", "");
             if (arPageNames[0] == null)
+            { 
                 NamingPages();
+            }
+            if (!Unique)
+                DeletingText();
             for (int i = 0; i < PageMax; i++)
             {
                 arText[i] = tree.GetString(arPageNames[i], "");
@@ -144,7 +162,11 @@ namespace books.src
             tree.SetInt("PageMax", PageMax);
             tree.SetString("title", Title);
             if (arPageNames[0] == null)
+            {
                 NamingPages();
+            }
+            if (!Unique)
+                DeletingText();
             // TODO: rewrite to only send data on read
             // only always load title and maxpage number info!
             for (int i = 0; i < PageMax; i++)
@@ -156,22 +178,28 @@ namespace books.src
         public override void OnBlockBroken()
         {
             // unregister renderer?
-            if(Api.World is ICoreClientAPI)
+            if ((Api is ICoreClientAPI) && (!isPaper))
                 BookAnim.Dispose();
             // keep data
             // base.OnBlockBroken(); 
         }
         
 
-        public void OnRightClick(IPlayer byPlayer)
+        public void OnRightClick(IPlayer byPlayer, bool isPaper)
         {
             string controlRW = flag_R;
 
             ItemSlot hotbarSlot = byPlayer.InventoryManager.ActiveHotbarSlot;
 
+            if(isPaper)
+                this.isPaper = isPaper;
+
+            if (arText[0]== null)
+                DeletingText();
+
             if (byPlayer?.Entity?.Controls?.Sprint == true)
             {
-                if (Api is ICoreClientAPI)
+                if ((Api is ICoreClientAPI) && (!isPaper))
                     BookAnim.Close(Api);
             }
 
@@ -185,8 +213,6 @@ namespace books.src
                     controlRW = flag_W;
                 }
             }
-            if (arText[0] == null)
-                DeletingText();
 
             if (Api.World is IServerWorldAccessor)
             {
@@ -269,11 +295,12 @@ namespace books.src
 
                     if (controlRW.Equals(flag_W))
                     {
-                        BooksGui BGuiWrite = new BooksGui(unique, Title, arText, PageMax, Api as ICoreClientAPI, IDDialogBookEditor);
+                        BooksGui BGuiWrite = new BooksGui(isPaper, unique, Title, arText, PageMax, Api as ICoreClientAPI, IDDialogBookEditor);
                         BGuiWrite.WriteGui(Pos, Api as ICoreClientAPI);
                         BGuiWrite.OnCloseCancel = () =>
                         {
-                            BookAnim.Close();
+                            if ((Api is ICoreClientAPI) && (!isPaper))
+                                BookAnim.Close();
                             (Api as ICoreClientAPI)
                             .Network
                             .SendBlockEntityPacket(
@@ -284,11 +311,12 @@ namespace books.src
                         BGuiWrite?.TryOpen();
                     }
                     else {
-                        BooksGui BGuiRead = new BooksGui(unique, Title, arText, PageMax, Api as ICoreClientAPI, IDDialogBookReader);
+                        BooksGui BGuiRead = new BooksGui(isPaper, unique, Title, arText, PageMax, Api as ICoreClientAPI, IDDialogBookReader);
                         BGuiRead.ReadGui(Pos, Api as ICoreClientAPI);
                         BGuiRead.OnCloseCancel = () =>
                         {
-                            BookAnim.Close();
+                            if ((Api is ICoreClientAPI) && (!isPaper))
+                                BookAnim.Close();
                             (Api as ICoreClientAPI)
                             .Network
                             .SendBlockEntityPacket(
@@ -298,7 +326,7 @@ namespace books.src
                         };
                         BGuiRead?.TryOpen();
                     }
-                    if (Api is ICoreClientAPI)
+                    if ((Api is ICoreClientAPI) && (!isPaper))
                     {
                         BookAnim.Open(Api);
                     }

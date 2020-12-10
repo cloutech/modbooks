@@ -13,12 +13,14 @@ using Vintagestory.API.Util;
 
 namespace books.src
 {
-
-    class BlockBooks : Block
+    class BlockPaper : Block
     {
         public ICoreAPI Api;
 
         public WorldInteraction[] interactbook;
+
+        public static bool
+            isPaper = true;
 
         public static string
             IDInteract = "BooksBlockInteract",
@@ -67,11 +69,6 @@ namespace books.src
                         ActionLangCode = ALCHelpRead,
                         MouseButton = EnumMouseButton.Right
                     },
-                   new WorldInteraction() {
-                        ActionLangCode = ALCHelpClose,
-                        HotKeyCode = _HotKeyClose,
-                        MouseButton = EnumMouseButton.Right
-                    },
                     new WorldInteraction()
                     {
                         ActionLangCode = ALCHelpWrite,
@@ -90,7 +87,7 @@ namespace books.src
             if (Entity is BlockEntityBooks)
             {
                 BlockEntityBooks BEBooks = (BlockEntityBooks)Entity;
-                BEBooks.OnRightClick(byPlayer, false);
+                BEBooks.OnRightClick(byPlayer, isPaper);
                 return true;
             }
             return true;
@@ -103,8 +100,8 @@ namespace books.src
 
 
         public override void OnBlockBroken(IWorldAccessor world, BlockPos blockPos, IPlayer byPlayer, float dropQuantityMultiplier = 0)
-        {   
-                  
+        {
+
             BlockEntity beb = world.BlockAccessor.GetBlockEntity(blockPos) as BlockEntityBooks;
 
             if (beb is BlockEntityBooks)
@@ -132,7 +129,7 @@ namespace books.src
                 }
                 else
                     base.OnBlockBroken(world, blockPos, byPlayer);
-            }  
+            }
         }
 
         public override void OnBlockPlaced(IWorldAccessor world, BlockPos blockPos, ItemStack byItemStack)
@@ -141,13 +138,13 @@ namespace books.src
             api.World.BlockAccessor.SpawnBlockEntity("BlockEntityBooks", blockPos, byItemStack);
 
             BlockEntity beb = world.BlockAccessor.GetBlockEntity(blockPos) as BlockEntityBooks;
-            
+
             if (beb is BlockEntityBooks)
             {
                 BlockEntityBooks BEBooks = (BlockEntityBooks)beb;
 
                 if (BEBooks == null)
-                    BEBooks = new BlockEntityBooks(blockPos, false);
+                    BEBooks = new BlockEntityBooks(blockPos, true);
 
                 BEBooks.PageMax = byItemStack.Attributes.GetInt(savePageMax, 1);
                 BEBooks.Title = byItemStack.Attributes.GetString(saveTitle, "");
@@ -186,7 +183,7 @@ namespace books.src
                         temp = "",
                         title = inSlot.Itemstack.Attributes.GetString(saveTitle);
                     dsc.Replace("Wood", "Paper");
-                    temp = string.Concat(descr, title,"\n");
+                    temp = string.Concat(descr, title, "\n");
                     dsc.Insert(0, temp);
                     len = temp.Length;
                     if (inSlot.Itemstack.Attributes.HasAttribute(saveAuthor))
