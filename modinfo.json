@@ -4,8 +4,8 @@
   "name": "Books, Paper and Ink",
   "author": "Christoph Clouser",
   "description": "Adds ink, paper, books, pen, quill and more to write with!",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "dependency": {
-    "game": "1.14.2"
+    "game": "1.15.5"
   }
 }

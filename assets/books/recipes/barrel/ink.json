@@ -1,20 +1,10 @@
-[
+
 	{
 		code: "makeblackinkR",
 		sealHours: 0,
 		ingredients: [
 			{ type: "item", code: "books:ironsulfide", quantity: 25},
-			{ type: "item", code: "game:resin", quantity: 1  }
+			{ type: "item", code: "game:resin", quantity: 1  , consumeQuantity:1}
 		],
 		output: { type: "item", code: "books:blackink", stackSize: 25 }
-	},
-	{
-		code: "makeblackinkH",
-		sealHours: 2,
-		ingredients: [
-			{ type: "item", code: "books:ironsulfide", quantity: 10},
-			{ type: "item", code: "game:honeyportion", quantity: 1  }
-		],
-		output: { type: "item", code: "books:blackink", stackSize: 10 }
 	}
-]

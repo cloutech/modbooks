@@ -1,7 +1,7 @@
 {
 	code: "fillinkwell",
 	ingredients: [
-		{ type: "item", code: "books:blackink",  quantity: 1, consumeQuantity: 2 },
+		{ type: "item", code: "books:blackink",  quantity: 1, consumeQuantity: 1 },
 		{ type: "block", code: "books:inkwell-empty", quantity: 1, }
 	],
 	output: { type: "block", code: "books:inkwell-ink", stackSize: 1 }

@@ -1,11 +1,8 @@
-[
-	{ 
-		code: "makesulfuricacid",
-		sealHours: 0,
-		ingredients: [
-			{ type: "item", code: "game:ore-sulfur", quantity: 1},
-			{ type: "item", code: "game:waterportion", quantity: 10 }
-		],
-		output: { type: "item", code: "books:sulfuricacid", stackSize: 10 }
-	}
-]
+{ 
+	code: "makesulfuricacid",
+	ingredients: [
+		{ type: "item", code: "game:ore-sulfur", quantity: 1, consumeQuantity: 1},
+		{ type: "item", code: "game:waterportion", quantity: 50 }
+	],
+	output: { type: "item", code: "books:sulfuricacid", stackSize: 50 }
+}
