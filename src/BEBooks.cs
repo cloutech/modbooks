@@ -50,7 +50,7 @@ namespace books.src
             Unique;
 
         public ItemStack tempStack;
-        private BooksAnimationHandler BookAnim;
+        //private BooksAnimationHandler BookAnim;
 
         public BlockEntityBooks() : base() { }
 
@@ -111,7 +111,7 @@ namespace books.src
           
         }
 
-
+        /*
         public override bool OnTesselation(ITerrainMeshPool mesher, ITesselatorAPI tessThreadTesselator)
         {
             if ((Api is ICoreClientAPI) && (!isPaper))
@@ -119,14 +119,14 @@ namespace books.src
             else
                 return false;
         }
-
+        */
         public override void Initialize(ICoreAPI api)
         {
             base.Initialize(api);
             this.Api = api;
 
-            if ((api is ICoreClientAPI)&& (!isPaper))
-                BookAnim = new BooksAnimationHandler(api as ICoreClientAPI, this);
+           // if ((api is ICoreClientAPI)&& (!isPaper))
+           //     BookAnim = new BooksAnimationHandler(api as ICoreClientAPI, this);
 
             if (arPageNames == null)
             {
@@ -181,8 +181,8 @@ namespace books.src
         public override void OnBlockBroken()
         {
             // unregister renderer?
-            if ((Api is ICoreClientAPI) && (!isPaper))
-                BookAnim.Dispose();
+            //if ((Api is ICoreClientAPI) && (!isPaper))
+            //    BookAnim.Dispose();
             // keep data
             // base.OnBlockBroken(); 
         }
@@ -200,11 +200,11 @@ namespace books.src
             if (arText[0]== null)
                 DeletingText();
 
-            if (byPlayer?.Entity?.Controls?.Sprint == true)
-            {
-                if ((Api is ICoreClientAPI) && (!isPaper))
-                    BookAnim.Close(Api);
-            }
+            //if (byPlayer?.Entity?.Controls?.Sprint == true)
+            //{
+            //    if ((Api is ICoreClientAPI) && (!isPaper))
+            //        BookAnim.Close(Api);
+            //}
 
             if (byPlayer?.Entity?.Controls?.Sneak == true)
             {
@@ -302,8 +302,8 @@ namespace books.src
                         BGuiWrite.WriteGui(Pos, Api as ICoreClientAPI);
                         BGuiWrite.OnCloseCancel = () =>
                         {
-                            if ((Api is ICoreClientAPI) && (!isPaper))
-                                BookAnim.Close();
+                            //if ((Api is ICoreClientAPI) && (!isPaper))
+                            //    BookAnim.Close();
                             (Api as ICoreClientAPI)
                             .Network
                             .SendBlockEntityPacket(
@@ -318,8 +318,8 @@ namespace books.src
                         BGuiRead.ReadGui(Pos, Api as ICoreClientAPI);
                         BGuiRead.OnCloseCancel = () =>
                         {
-                            if ((Api is ICoreClientAPI) && (!isPaper))
-                                BookAnim.Close();
+                            //if ((Api is ICoreClientAPI) && (!isPaper))
+                            //    BookAnim.Close();
                             (Api as ICoreClientAPI)
                             .Network
                             .SendBlockEntityPacket(
@@ -329,10 +329,10 @@ namespace books.src
                         };
                         BGuiRead?.TryOpen();
                     }
-                    if ((Api is ICoreClientAPI) && (!isPaper))
-                    {
-                        BookAnim.Open(Api);
-                    }
+                    //if ((Api is ICoreClientAPI) && (!isPaper))
+                    //{
+                    //    BookAnim.Open(Api);
+                    //}
                 }
             }
         }

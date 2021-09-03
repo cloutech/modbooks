@@ -64,7 +64,7 @@ namespace books.src
                     }
                 }
                 return new WorldInteraction[] {
-                     new WorldInteraction()
+                    new WorldInteraction()
                     {
                         ActionLangCode = ALCHelpRead,
                         MouseButton = EnumMouseButton.Right
