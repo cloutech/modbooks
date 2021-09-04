@@ -3,7 +3,7 @@
 		code: "makeblackinkR",
 		sealHours: 0,
 		ingredients: [
-			{ type: "item", code: "books:ironsulfide", quantity: 25},
+			{ type: "item", code: "books:ironsulfate", quantity: 25},
 			{ type: "item", code: "game:resin", quantity: 1  , consumeQuantity:1}
 		],
 		output: { type: "item", code: "books:blackink", stackSize: 25 }

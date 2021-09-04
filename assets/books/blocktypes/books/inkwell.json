@@ -41,6 +41,7 @@
 
 	shapeByType: {
 		"*-ink": { base: "block/books/inkwell" },
+		"*-empty": { base: "block/books/inkwell" },
 		"*": { base: "block/books/inkwell" },
 	},
 	creativeinventory: { "general": ["*"], "decorative": ["*"] },
@@ -48,6 +49,7 @@
 	resistance: 0.75,
 	maxStackSizeByType: {
 		"*-ink": 64,
+		"*-empty": 64,
 		"*": 64,
 	},
 	
@@ -65,9 +67,9 @@
 		all: false
 	},
 	sounds: {
-		"place": "player/buildhigh",
-		"break": "block/glass",
-		"hit": "block/glass",
+		place: "player/buildhigh",
+		break: "block/glass",
+		hit: "block/glass",
 		walk: "walk/stone",
 	},
 	collisionbox: { x1: 0.42, y1: 0, z1: 0.42, x2: 0.58, y2: 0.12, z2: 0.58, rotateY: 0 },
@@ -90,6 +92,12 @@
 		rotation: { x: 36, y: -53, z: -22 },
 		origin: { x: 0, y: 0, z: 0 },
 		scale: 1.5
+	},
+	groundTransform: {
+		translation: { x: 0, y: 0, z: 0 },
+		rotation: { x: 0, y: 0, z: 0 },
+		origin: { x: 0, y: 0, z: 0 },
+		scale: 6
 	},
 	attributes: {
 		onDisplayTransform: {
