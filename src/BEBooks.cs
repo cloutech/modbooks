@@ -49,7 +49,9 @@ namespace books.src
             isPaper = false,
             Unique;
 
-        public ItemStack tempStack;
+        public ItemStack
+            tempStack = null,
+            tempStack2 = null;
         //private BooksAnimationHandler BookAnim;
 
         public BlockEntityBooks() : base() { }
@@ -145,6 +147,7 @@ namespace books.src
             Unique = tree.GetBool("unique", false);
             PageMax = tree.GetInt("PageMax", 1);
             Title = tree.GetString("title", "");
+            Author = tree.GetString("author", "");
             if (arPageNames[0] == null)
             { 
                 NamingPages();
@@ -164,6 +167,8 @@ namespace books.src
             tree.SetBool("unique", Unique);
             tree.SetInt("PageMax", PageMax);
             tree.SetString("title", Title);
+            tree.SetString("author", Author);
+
             if (arPageNames[0] == null)
             {
                 NamingPages();
@@ -208,18 +213,33 @@ namespace books.src
 
             if (byPlayer?.Entity?.Controls?.Sneak == true)
             {
-                if ((hotbarSlot?.Itemstack?.ItemAttributes?["quillink"].Exists == true)
-                        || (hotbarSlot?.Itemstack?.ItemAttributes?["pen"].Exists == true))
+                if (hotbarSlot?.Itemstack?.ItemAttributes?["quillink"].Exists == true)
                 {
                     tempStack = hotbarSlot.TakeOut(1);
                     hotbarSlot.MarkDirty();
                     controlRW = flag_W;
+                }
+                else if (hotbarSlot?.Itemstack?.ItemAttributes?["pen"].Exists == true)
+                {
+                    tempStack2 = hotbarSlot.TakeOut(1);
+                    hotbarSlot.MarkDirty();
+                    controlRW = flag_W;
+                }
+                else
+                {
+                    tempStack = null;
+                    tempStack2 = null;
                 }
             }
 
             if (Api.World is IServerWorldAccessor)
             {
                 byte[] data;
+                // Server sets author for now:
+                if (byPlayer.PlayerUID != "")
+                {
+                    Author = byPlayer.PlayerName;
+                }
                 using (MemoryStream ms = new MemoryStream())
                 {
                     BinaryWriter writer = new BinaryWriter(ms);
@@ -232,6 +252,7 @@ namespace books.src
                     writer.Write(Title);
                     writer.Write(controlRW);
                     writer.Write(Unique);
+                    writer.Write(Author);
 
                     data = ms.ToArray();
                 }
@@ -260,8 +281,16 @@ namespace books.src
                     }
                     Title = reader.ReadString();
                     Unique = reader.ReadBoolean();
+                    Author = reader.ReadString();
                 }
                 NamingPages();
+
+                // Player as author:
+                if (player.PlayerUID != "")
+                {
+                    Author = player.PlayerName;
+                }
+
                 MarkDirty(true);
                 Api.World.BlockAccessor.GetChunkAtBlockPos(Pos.X, Pos.Y, Pos.Z).MarkModified();
             }
@@ -270,8 +299,35 @@ namespace books.src
             {
                 player.InventoryManager.TryGiveItemstack(tempStack);
             }
+            else if (packetid == (int)EnumBookPacketId.CancelEdit && tempStack2 != null)
+            {
+                player.InventoryManager.TryGiveItemstack(tempStack2);
+            }
+            else if(tempStack != null)
+            {
+                if (Api.World.BlockAccessor.GetBlock(new AssetLocation("books:inkwell-empty")) != null)
+                {
+                    // always give back inkwell to refill
+                    ItemStack isInkewellEmpty = new ItemStack(Api.World.GetBlock(new AssetLocation("books:inkwell-empty")), 1);
+                    Api.World.SpawnItemEntity(isInkewellEmpty, player.CurrentBlockSelection.Position.ToVec3d());
+                }
+                if (Api.World.GetItem(new AssetLocation("books:itemquill")) != null)
+                {
+                    // quill might break 30% of times:
+                    int
+                        max = 9,
+                        min = 0,
+                        chance = 7;
+                    Random rand = new Random();
+                    if (rand.Next(min, max) < chance)
+                    {
+                        ItemStack isItemquill = new ItemStack(Api.World.GetItem(new AssetLocation("books:itemquill")), 1);
+                        Api.World.SpawnItemEntity(isItemquill, player.CurrentBlockSelection.Position.ToVec3d());
+                    }
+                }
+            }
             tempStack = null;
-
+            tempStack2 = null;
         }
 
         public override void OnReceivedServerPacket(int packetid, byte[] data)
@@ -292,6 +348,7 @@ namespace books.src
                     Title = reader.ReadString();
                     string controlRW = reader.ReadString();
                     bool unique = reader.ReadBoolean();
+                    string author = reader.ReadString();
 
                     IClientWorldAccessor clientWorld = (IClientWorldAccessor)Api.World;
 

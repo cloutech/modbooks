@@ -116,7 +116,7 @@ namespace books.src
                     ItemStack UniqueBook = new ItemStack(api.World.BlockAccessor.GetBlock(blockPos));
                     TreeAttribute BookTree = new TreeAttribute();
                     BookTree.SetString(saveTitle, BEBooks.Title);
-                    BookTree.SetString(saveAuthor, defaultAuthor);
+                    BookTree.SetString(saveAuthor, BEBooks.Author);
                     BookTree.SetInt(savePageMax, BEBooks.PageMax);
                     BookTree.SetBool(saveIsUnique, BEBooks.Unique);
                     for (int i = 0; i < BEBooks.PageMax; i++)
@@ -148,7 +148,7 @@ namespace books.src
                     BEBooks = (BlockEntityBooks)be;
                     BEBooks.PageMax = byItemStack.Attributes.GetInt(savePageMax, 1);
                     BEBooks.Title = byItemStack.Attributes.GetString(saveTitle, "");
-                    BEBooks.Author = byItemStack.Attributes.GetString(saveAuthor, "Unknown");
+                    BEBooks.Author = byItemStack.Attributes.GetString(saveAuthor, defaultAuthor);
                     BEBooks.Unique = byItemStack.Attributes.GetBool(saveIsUnique, false);
                     BEBooks.DeletingText();
                     BEBooks.NamingPages();
@@ -195,7 +195,6 @@ namespace books.src
             }
         }
 
-
         public override string GetPlacedBlockName(IWorldAccessor world, BlockPos pos)
         {
             // renaming unique books, so title is shown for easier handling
@@ -203,10 +202,19 @@ namespace books.src
             if (beb is BlockEntityBooks)
             {
                 BlockEntityBooks BEBooks = (BlockEntityBooks)beb;
-                if (BEBooks.Title == "")
+                if (BEBooks.Title == "" || BEBooks.Author == "")
+                {
                     return base.GetPlacedBlockName(world, pos);
+                }
                 else
-                    return BEBooks.Title;
+                {
+                    string 
+                        shownInfo = "",
+                        sTitle = BEBooks.Title,
+                        sAuthor = BEBooks.Author;
+                    shownInfo = string.Concat(BEBooks.Title," written by ", BEBooks.Author);
+                    return shownInfo;
+                }
             }
             return base.GetPlacedBlockName(world, pos);
         }

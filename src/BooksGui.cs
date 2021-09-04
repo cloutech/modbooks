@@ -47,6 +47,8 @@ namespace books.src
             Title = "",
             CurrentPageNumbering = "1/1",
             EditTitle = "",
+            Author = "",
+            // Author by ID or leave to player to fill out?
             // button texts:
             _bCancel = "",
             _bSave = "",
@@ -78,7 +80,7 @@ namespace books.src
             _bNextPage = ">>",
             _bPrevPage = "<<";
 
-        private string[] Text = new string[20];
+        private string[] Text = new string[30];
 
         BlockPos BEPos;
 
@@ -438,7 +440,6 @@ namespace books.src
             }
         }
 
-
         private void OnTitleBarClose()
         {
             OnButtonCancel();
@@ -452,7 +453,7 @@ namespace books.src
             {
                 SavingInputTemporary();
                 Unique = true;
-
+  
                 byte[] data;
                 using (MemoryStream ms = new MemoryStream())
                 {
@@ -464,6 +465,7 @@ namespace books.src
                     }
                     writer.Write(Title);
                     writer.Write(Unique);
+                    writer.Write(Author);
                     data = ms.ToArray();
                 }
                 capi
