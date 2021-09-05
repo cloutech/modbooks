@@ -41,16 +41,15 @@
 
 	shapeByType: {
 		"*-ink": { base: "block/books/inkwell" },
-		"*-empty": { base: "block/books/inkwell" },
 		"*": { base: "block/books/inkwell" },
 	},
 	creativeinventory: { "general": ["*"], "decorative": ["*"] },
 	replaceable: 300,
 	resistance: 0.75,
 	maxStackSizeByType: {
-		"*-ink": 64,
-		"*-empty": 64,
-		"*": 64,
+		"*-ink": 1,
+		"*-empty": 1,
+		"*": 1,
 	},
 	
 	textures: {
